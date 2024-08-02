@@ -155,7 +155,7 @@ const Tab1Index = () => {
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [post, setPosts] = useState(null);
+  const [post, setPosts] = useState([]);
 
   const user= AuthStore.getRawState().user;
 
@@ -255,7 +255,6 @@ const router = useRouter();
   
 <FlatList
 	data={[{}]}
-	keyExtractor={() => null}
 	renderItem={() =><>
 
 
@@ -341,16 +340,18 @@ const router = useRouter();
   paddingTop:6,width:'94%',marginLeft:'3%',marginRight:'3%'}}> My Complains</Text>    
 
 <FlatList
-          data={post}
-          contentContainerStyle={{paddingBottom:100}}
-          renderItem={({item, index}) => {
-            return (
-
-              <ComplainBox Title={item.header} date={item.postTime} image={item.images[0]}/>
-
-            );
-          }}
-        />
+  data={post.length ? post : [{ placeholder: true }]}
+  keyExtractor={(item) => item.id || 'placeholder'}
+  renderItem={({ item }) => {
+    if (item.placeholder) {
+      return <Text>No complaints available</Text>;
+    }
+    return (
+      <ComplainBox Title={item.header} date={item.postTime} image={item.images[0]} images={item.images}/>
+      
+    );
+  }}
+/>
  
 
 

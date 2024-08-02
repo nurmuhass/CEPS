@@ -77,7 +77,7 @@ const PostComplain = () => {
       }
     };
     const currentDate = new Date();
-    const formattedTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const formattedTime = currentDate.toLocaleTimeString();
 
     const validate = () => {
       let isValid = true;
@@ -205,28 +205,29 @@ const PostComplain = () => {
 
  
     <RichEditor
-        ref={richText}
-        style={styles.richEditor}
-        placeholder="Write your complaint here..."
-        initialContentHTML=""
-        onChange={handleContentChange}
-        useContainer={true}
-        initialFocus={false}
-      />
-      <RichToolbar
-        editor={richText}
-        selectedIconTint="#873c1e"
-        iconTint="#312921"
-        actions={[
-          actions.setBold,
-          actions.setItalic,
-          actions.setUnderline,
-          actions.heading1,
-          actions.insertBulletsList,
-          actions.insertOrderedList,
-        ]}
-        style={styles.richToolbar}
-      />
+  ref={richText}
+  style={styles.richEditor}
+  placeholder="Write your complaint here..."
+  initialContentHTML=""
+  onChange={handleContentChange}
+  useContainer={true}
+  initialFocus={false}
+/>
+<RichToolbar
+  editor={richText} // Pass the ref to the editor prop
+  selectedIconTint="#873c1e"
+  iconTint="#312921"
+  actions={[
+    actions.setBold,
+    actions.setItalic,
+    actions.setUnderline,
+    actions.heading1,
+    actions.insertBulletsList,
+    actions.insertOrderedList,
+  ]}
+  style={styles.richToolbar}
+/>
+
       <Text style={styles.characterCount}>
         {`${content.replace(/<[^>]*>?/gm, '').length}/${CHARACTER_LIMIT} characters`}
       </Text>

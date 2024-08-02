@@ -3,22 +3,21 @@ import React from 'react'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 
-const ComplainBox = ({Title,date,image}) => {
+const ComplainBox = ({Title,date,image,images}) => {
   return (
     <View style={{backgroundColor:'#fff',width:'94%',padding:15,borderRadius:10,marginBottom:12,
     marginLeft:'3%',marginRight:'3%'}}>
       <View style={{flexDirection:"row",}}>
-        {image ==='' ?
- <Image source={require("../images/DefaultImage.jpg")} style={{width:70,height:90,borderRadius:8}}/>
-
-:
-
-<Image source={{uri:image}} style={{width:70,height:90,borderRadius:8,borderWidth:0.8,borderColor:'#e1e8ee'}}/>
-
-        }
+        
+      {images.length === 0 ? (
+  <Image source={require("../images/DefaultImage.jpg")} style={{width:70,height:90,borderRadius:8}}/>
+) : (
+  <Image source={{uri: images[0]}} style={{width:70,height:90,borderRadius:8,borderWidth:0.8,borderColor:'#e1e8ee'}}/>
+)}
            
             <View style={{justifyContent:'center',marginLeft:10}}>
 <Text style={{fontSize:20,fontWeight:"800"}} numberOfLines={1}>{Title}</Text>
+
 <Text>{date}</Text>
             </View>
       </View>
