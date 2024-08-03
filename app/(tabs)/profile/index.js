@@ -110,7 +110,7 @@ console.log(error.message)
 <TouchableOpacity  onPress={async () => {
           const resp = await appSignOut();
           if (!resp?.error) {
-            router.replace("/(auth)/login");
+            router.replace("/(auth)/welcome");
           } else {
             console.log(resp.error);
             Alert.alert("Logout Error", resp.error?.message);

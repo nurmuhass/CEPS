@@ -15,27 +15,27 @@ import { ReText } from 'react-native-redash';
 
 const content = [
   {
-    title: "Let's create.",
+    title: "Your voice matters.",
     bg: ColorPalette.lime,
     fontColor: ColorPalette.pink,
   },
   {
-    title: "Let's brainstorm.",
+    title: "Share your challenges",
     bg: ColorPalette.brown,
     fontColor: ColorPalette.sky,
   },
   {
-    title: "Let's discover.",
+    title: "Share your concerns",
     bg: ColorPalette.grey,
     fontColor: '#fff',
   },
   {
-    title: "Let's go.",
+    title:"For a better community.",
     bg: ColorPalette.teal,
     fontColor: ColorPalette.yellow,
   },
   {
-    title: 'GroqGPT.',
+    title:"Let's go.",
     bg: ColorPalette.green,
     fontColor: ColorPalette.pink,
   },
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   title: {
-    fontSize: 36,
+    fontSize: 30,
     fontWeight: '600',
     left: '0%',
     position: 'absolute',
