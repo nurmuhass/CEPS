@@ -24,6 +24,7 @@ import { getStorage, ref, uploadBytes,getDownloadURL } from "firebase/storage";
 import { Alert } from 'react-native';
 import { doc, onSnapshot, query, where } from "firebase/firestore";
 import { AuthStore } from '../store';
+
 const CHARACTER_LIMIT = 300;
 
 const PostComplain = () => {
@@ -43,13 +44,41 @@ const PostComplain = () => {
     const [uploading, setUploading] = useState(false);
     const [transferred, setTransferred] = useState(0);
     const richText = useRef();
-
+    const [userData, setUserData] = useState(null);
     const user = auth.currentUser;
 
  
     const role =AuthStore.getRawState().role
 
-
+    const getUser = async () => {
+  
+      const docRef = doc(db, 'users', user.uid)
+      
+      const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      
+       if (docSnap.exists()) {
+      
+         setUserData(docSnap.data());
+        
+       } else {
+         console.log('No User Data');
+       }
+      
+       setLoading(false);
+      });
+      
+      // This will detach the listener when the component is unmounted
+      return () => {
+       
+       unsubscribe();
+      };
+      };
+    
+      useEffect(() => {
+        // Fetch the user data first
+        getUser();
+      }, []); // Empty dependency array means this runs once when the component mounts
+      
     const pickImages = async () => {
       setIsLoading(true);
       try {
@@ -102,27 +131,24 @@ const PostComplain = () => {
         });
         isValid = false;
       }
-  if(role ==='citizen'){
-    if (!Ministry) {
-      newErrors.Ministry = 'Please select Ministry';
-      toastRef.current.show({
-        type: 'error',
-        text: "Please select Ministry",
-        duration: 2000,
-      });
-      isValid = false;
-    }
-  }
-      
-  
-      if (!header) {
-        newErrors.header = 'Please Enter Header';
-        toastRef.current.show({
-          type: 'error',
-          text: "Please Enter Header",
-          duration: 2000,
-        });
-        isValid = false;
+      if(role ==='citizen'){
+        if (!Ministry) {
+          newErrors.Ministry = 'Please select Ministry';
+          toastRef.current.show({
+            type: 'error',
+            text: "Please select Ministry",
+            duration: 2000,
+          });
+          isValid = false;
+        }else     if (!header) {
+          newErrors.header = 'Please Enter Header';
+          toastRef.current.show({
+            type: 'error',
+            text: "Please Enter Header",
+            duration: 2000,
+          });
+          isValid = false;
+        }
       }
   
       setErrors(newErrors);
@@ -170,6 +196,7 @@ const PostComplain = () => {
       setLoading(true);
       const imageUrls = await uploadImages();
     
+
       try {
         if (role === 'citizen') {
           // If the user is a citizen, add to the "posts" collection
@@ -179,17 +206,18 @@ const PostComplain = () => {
             Ministry: Ministry,
             content: content,
             postTime: formattedDate + ' ' + formattedTime,
-            images: imageUrls,
+            images:imageUrls.length === 0 ? null : imageUrls,
+            hasImage:imageUrls.length === 0 ? false : true,
           });
         } else if (role !== 'citizen') {
           // If the user is not a citizen, add to the "timeline" collection
           await addDoc(collection(db, "timeline"), {
             userId: user.uid,
-            header: header,
-            Ministry: userData.fullname, // Assuming the Ministry is the fullname of the user
+            Ministry: userData.fullname, 
             content: content,
             postTime: formattedDate + ' ' + formattedTime,
-            images: imageUrls,
+            images:imageUrls.length === 0 ? null : imageUrls,
+            hasImage:imageUrls.length === 0 ? false : true,
           });
         }
     
@@ -270,35 +298,40 @@ const PostComplain = () => {
     
 
 
-<View style={{marginTop:90}}>
+ <View style={{marginTop: role === 'citizen' ? 90 :20}}>
 
+
+ {role === 'citizen' ?  
 
 <TextInput
-            placeholder="Enter a title..."
-            value={header}
-           onChangeText={(text) => setHeader(text)}
-            style={{width:'96%',marginBottom:20,borderBottomWidth:1,paddingLeft:20,fontSize:18,marginTop:30,marginLeft:"2%",marginRight:"2%",borderBottomColor:'#555'}}
-          />    
+          placeholder="Enter a title..."
+          value={header}
+         onChangeText={(text) => setHeader(text)}
+          style={{width:'96%',marginBottom:20,borderBottomWidth:1,paddingLeft:20,fontSize:18,marginTop:30,marginLeft:"2%",marginRight:"2%",borderBottomColor:'#555'}}
+        />  
+        
+        :
+        role === 'ministry' ? '' :
+        ''
+      }
 
 {role === 'citizen' ?   <Picker
-    selectedValue={Ministry}
-    onValueChange={(itemValue, itemIndex) =>
-        setMinistry(itemValue)
-    } style={{  borderWidth:2, 
-        borderColor:"white",color:'white',width:"95%",margin:10,borderRadius:8,backgroundColor:'black',marginTop:0}}>
-    <Picker.Item label="Choose Ministry" value="Choose Ministry" disabled/>
+  selectedValue={Ministry}
+  onValueChange={(itemValue, itemIndex) =>
+      setMinistry(itemValue)
+  } style={{  borderWidth:2, 
+      borderColor:"white",color:'white',width:"95%",margin:10,borderRadius:8,backgroundColor:'black',marginTop:0}}>
+  <Picker.Item label="Choose Ministry" value="Choose Ministry" disabled/>
 
-    {data.map((item,index)=>{
-        return(
-        <Picker.Item label={item.title} value={item.title}  key={item.id}/>
-    )})}
-    
-    </Picker>  :
-    role === 'ministry' ? '' :
-    ''
-  }
-
-
+  {data.map((item,index)=>{
+      return(
+      <Picker.Item label={item.title} value={item.title}  key={item.id}/>
+  )})}
+  
+  </Picker>  :
+  role === 'ministry' ? '' :
+  ''
+}
 
 
     

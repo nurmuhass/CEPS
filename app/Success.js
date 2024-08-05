@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, StatusBar } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { db } from '../firebase-config';
+import { auth, db } from '../firebase-config';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { AuthStore } from '../store';
 
@@ -15,7 +15,6 @@ const Success = () => {
       };
 
 
-      const user = auth.currentUser;
       const role =AuthStore.getRawState().role
 
   return (
@@ -29,15 +28,15 @@ const Success = () => {
       { role === 'citizen'?
 
 <View>
-<Text style={styles.msg}>{'Your Complain have been'}</Text>
-<Text style={{...styles.msg,marginTop:2}}>{' submitted succesfully'}</Text>
+<Text sstyle={{...styles.msg,alignSelf:'center'}}>{'Your Complain have'}</Text>
+<Text style={{...styles.msg,marginTop:2}}>{'been submitted succesfully'}</Text>
 </View>
 
 :
 
 <View>
-<Text style={styles.msg}>{'Your post have been'}</Text>
-<Text style={{...styles.msg,marginTop:2}}>{' submitted succesfully'}</Text>
+<Text style={{...styles.msg,alignSelf:'center'}}>{'Your post have'}</Text>
+<Text style={{...styles.msg,marginTop:2}}>{'been submitted succesfully'}</Text>
 </View>
 
       }

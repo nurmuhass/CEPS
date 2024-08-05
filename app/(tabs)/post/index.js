@@ -17,7 +17,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import { TextInput } from 'react-native';
 import { auth, db, storage } from '../../../firebase-config';
 import { addDoc, collection } from 'firebase/firestore';
-
+import { doc, onSnapshot, query, where } from "firebase/firestore";
 import { getStorage, ref, uploadBytes,getDownloadURL } from "firebase/storage";
 import { Alert } from 'react-native';
 import Loading from '../../../components/Loading';
@@ -42,12 +42,42 @@ const Post = () => {
   const [errors, setErrors] = useState({});
   const [uploading, setUploading] = useState(false);
   const [transferred, setTransferred] = useState(0);
+  const [userData, setUserData] = useState(null);
   const richText = useRef();
 
   const user = auth.currentUser;
  
   const role =AuthStore.getRawState().role
 
+  const getUser = async () => {
+  
+    const docRef = doc(db, 'users', user.uid)
+    
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    
+     if (docSnap.exists()) {
+    
+       setUserData(docSnap.data());
+      
+     } else {
+       console.log('No User Data');
+     }
+    
+     setLoading(false);
+    });
+    
+    // This will detach the listener when the component is unmounted
+    return () => {
+     
+     unsubscribe();
+    };
+    };
+  
+    useEffect(() => {
+      // Fetch the user data first
+      getUser();
+    }, []); // Empty dependency array means this runs once when the component mounts
+    
 
   const pickImages = async () => {
     setIsLoading(true);
@@ -110,19 +140,19 @@ if(role ==='citizen'){
       duration: 2000,
     });
     isValid = false;
+  }else     if (!header) {
+    newErrors.header = 'Please Enter Header';
+    toastRef.current.show({
+      type: 'error',
+      text: "Please Enter Header",
+      duration: 2000,
+    });
+    isValid = false;
   }
 }
     
 
-    if (!header) {
-      newErrors.header = 'Please Enter Header';
-      toastRef.current.show({
-        type: 'error',
-        text: "Please Enter Header",
-        duration: 2000,
-      });
-      isValid = false;
-    }
+
 
     setErrors(newErrors);
     return isValid;
@@ -168,7 +198,9 @@ if(role ==='citizen'){
   
     setLoading(true);
     const imageUrls = await uploadImages();
+
   
+
     try {
       if (role === 'citizen') {
         // If the user is a citizen, add to the "posts" collection
@@ -178,17 +210,18 @@ if(role ==='citizen'){
           Ministry: Ministry,
           content: content,
           postTime: formattedDate + ' ' + formattedTime,
-          images: imageUrls,
+          images:imageUrls.length === 0 ? null : imageUrls,
+          hasImage:imageUrls.length === 0 ? false : true,
         });
       } else if (role !== 'citizen') {
         // If the user is not a citizen, add to the "timeline" collection
         await addDoc(collection(db, "timeline"), {
           userId: user.uid,
-          header: header,
-          Ministry: userData.fullname, // Assuming the Ministry is the fullname of the user
+          Ministry: userData.fullname, 
           content: content,
           postTime: formattedDate + ' ' + formattedTime,
-          images: imageUrls,
+          images:imageUrls.length === 0 ? null : imageUrls,
+          hasImage:imageUrls.length === 0 ? false : true,
         });
       }
   
@@ -269,15 +302,21 @@ style={styles.richToolbar}
   
 
 
-<View style={{marginTop:90}}>
+<View style={{marginTop: role === 'citizen' ? 90 :20}}>
 
+{role === 'citizen' ?  
 
 <TextInput
           placeholder="Enter a title..."
           value={header}
          onChangeText={(text) => setHeader(text)}
           style={{width:'96%',marginBottom:20,borderBottomWidth:1,paddingLeft:20,fontSize:18,marginTop:30,marginLeft:"2%",marginRight:"2%",borderBottomColor:'#555'}}
-        />    
+        />  
+        
+        :
+        role === 'ministry' ? '' :
+        ''
+      }
 
 {role === 'citizen' ?   <Picker
   selectedValue={Ministry}

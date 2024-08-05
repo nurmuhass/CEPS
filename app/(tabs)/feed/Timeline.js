@@ -121,7 +121,7 @@ const renderItem = ({ item }) => (
 export default function TimeLine() {
   const router = useRouter();
 const [timeline,setTimeline]=useState(null)
-
+const [loading, setLoading] = useState(false);
   const getTimeline = async () => {
     try {
       setLoading(true); // Start loading
