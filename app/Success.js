@@ -1,6 +1,9 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, StatusBar } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
+import { db } from '../firebase-config';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { AuthStore } from '../store';
 
 
 const Success = () => {
@@ -11,6 +14,10 @@ const Success = () => {
         router.replace("/(tabs)/home");
       };
 
+
+      const user = auth.currentUser;
+      const role =AuthStore.getRawState().role
+
   return (
     <View style={styles.container}>
           <StatusBar
@@ -19,8 +26,23 @@ const Success = () => {
                  backgroundColor="#555"
               />
       <Image source={require('../images/checked.png')} style={styles.success} />
-      <Text style={styles.msg}>{'Your Complain have been'}</Text>
-      <Text style={{...styles.msg,marginTop:2}}>{' submitted succesfully'}</Text>
+      { role === 'citizen'?
+
+<View>
+<Text style={styles.msg}>{'Your Complain have been'}</Text>
+<Text style={{...styles.msg,marginTop:2}}>{' submitted succesfully'}</Text>
+</View>
+
+:
+
+<View>
+<Text style={styles.msg}>{'Your post have been'}</Text>
+<Text style={{...styles.msg,marginTop:2}}>{' submitted succesfully'}</Text>
+</View>
+
+      }
+     
+
       <TouchableOpacity
         style={styles.gotohome}
         onPress={handlePress}>

@@ -21,18 +21,21 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { getStorage, ref, uploadBytes,getDownloadURL } from "firebase/storage";
 import { collection, addDoc ,getDocs, setDoc, doc} from "firebase/firestore"; 
 import Toast from "../../components/Toast.js";
+import { Image } from "react-native";
+import { getStatusBarHeight } from "react-native-status-bar-height";
+import Checkbox from "expo-checkbox";
 
 export default function CreateAccount() {
   const router = useRouter();
   const emailRef = useRef("");
   const fullNameRef = useRef("");
   const passwordRef = useRef("");
-  const addressRef = useRef("");
   const phoneRef = useRef("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const toastRef = useRef(); 
   const [errors, setErrors] = useState({});
+  const [isChecked, setIsChecked] = useState(false);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -134,16 +137,7 @@ const bytes =await img.blob();
       });
       isValid = false;
     }
-  
-    if (!addressRef.current) {
-      newErrors.address = 'Please enter your home address';
-      toastRef.current.show({
-        type: 'error',
-        text: "Please enter your home address",
-        duration: 2000,
-      });
-      isValid = false;
-    }
+
   
     if (!passwordRef.current) {
       newErrors.password = 'Please enter password';
@@ -202,7 +196,7 @@ const bytes =await img.blob();
           fullname: fullNameRef.current,
           email: emailRef.current,
           phone: phoneRef.current,
-          address: addressRef.current,
+          role: 'citizen',
         });
       };
   
@@ -211,6 +205,7 @@ const bytes =await img.blob();
       AuthStore.update((store) => {
         store.user = auth.currentUser;
         store.isLoggedIn = true;
+        store.role = 'citizen';
       });
   
       setLoading(false);
@@ -224,7 +219,7 @@ const bytes =await img.blob();
 
 
   return (
-    <View style={{ flex: 1,backgroundColor:'#ffffff' }}>
+    <View style={{ flex: 1,backgroundColor:'#ffffff',paddingTop:getStatusBarHeight()}}>
   <StatusBar
     translucent
     barStyle="dark-content"
@@ -238,25 +233,28 @@ const bytes =await img.blob();
       />
 
 <TouchableOpacity style={{backgroundColor:'#f0f0f0',borderRadius:5,width:30,
-    marginTop:40,height:28,alignItems:'center',justifyContent:'center'}} onPress={router.back}>
+  height:28,alignItems:'center',justifyContent:'center'}} onPress={router.back}>
     <Ionicons name="chevron-back" size={18} color="black" />
   </TouchableOpacity>
 
-<View style={{marginTop:20}}>
-  <Text style={{fontSize:32,fontWeight:'bold'}}>Let's </Text>
-  <Text style={{fontSize:32,fontWeight:'bold'}}>Get Started</Text>
-</View>
-<Text style={{marginTop:10,color:'#555',fontSize:15}}>Please fill the details to create an account</Text>
+  <View style={{marginTop:5,alignItems:'center'}}>
+      <Image source={require("../../images/map.jpeg")} style={{width:80,height:70}}/>
+  </View>
 
+
+  <View style={{marginTop:15,alignItems:'center'}}>
+    <Text style={{fontSize:30,fontWeight:'bold'}}>Get Started</Text>
+    <Text style={{marginTop:5,color:'#555',fontSize:17,}}>by creating a free account</Text>
+  </View>
 
 
 <Toast ref={toastRef} topValue={80} />
  
-<View style={{justifyContent:'center',marginTop:10}}>
+<View style={{justifyContent:'center',marginTop:5}}>
 <TouchableOpacity
       style={{  padding: 13,
         borderRadius: 50,
-        alignItems: 'center',width:100,height:100,backgroundColor:'#555',justifyContent:'center',
+        alignItems: 'center',width:100,height:100,backgroundColor:'grey',justifyContent:'center',
         marginTop:20,
         alignSelf:'center',marginBottom:20}}
       onPress={pickImage}>
@@ -331,20 +329,6 @@ const bytes =await img.blob();
      
      </View>
 
-     <View>
-       <TextInput
-         placeholder="Enter Your Address"
-         nativeID="Address"
-         onChangeText={(text) => {
-          addressRef.current = text;
-         }}
-         style={styles.textInput}
-       />
-<AntDesign name="home"  size={18} color="#555"  style={styles.icon} />
-       
-     </View>
-
-
 
       <View>
        
@@ -361,7 +345,34 @@ const bytes =await img.blob();
       </View>
       </View>
       
- 
+      <View style={{
+                    flexDirection: 'row',
+                    marginVertical: 6,
+                    marginHorizontal:10,
+                    justifyContent:'space-between',
+                    alignItems:'center'
+                }}>
+
+      <View style={{
+                    flexDirection: 'row',
+                    marginVertical: 6
+                }}>
+                    <Checkbox
+                        style={{ marginRight: 8 }}
+                        value={isChecked}
+                        onValueChange={setIsChecked}
+                        color={isChecked ? '#F93C65' : undefined}
+                    />
+
+<Text style={{alignItems:'center',fontSize:11}}>
+  By checking the box you agree to our{' '}
+  <Text style={{ color: '#F93C65' }}>Terms</Text> and{' '}
+  <Text style={{ color: '#F93C65' }}>Conditions</Text>
+</Text>
+                </View>
+
+               
+</View>
  
 
       {loading ? 
@@ -375,11 +386,13 @@ const bytes =await img.blob();
 
       <Button
       buttonStyle={{marginTop:10,width:'95%',padding:15,
-        backgroundColor:'#00C26F',color:'#fff',borderRadius:20,shadowColor:'#3E3E3E',shadowOffset:{width:0,height:10},shadowOpacity:0.2,shadowRadius:8,elevation:4}}
+        backgroundColor:'#F93C65',color:'#fff',borderRadius:10,shadowColor:'#3E3E3E',shadowOffset:{width:0,height:10},shadowOpacity:0.2,shadowRadius:8,elevation:4}}
 
         onPress={validate}
       >
-        Sign up
+      Next
+
+        <Ionicons name="chevron-forward" size={20} color="white" style={{marginLeft:5}}/>
       </Button>
 
 }
@@ -388,7 +401,7 @@ const bytes =await img.blob();
 <Text
         onPress={() => {
           router.push("/login");
-        }} style={{color:'#00C26F',marginLeft:3}}
+        }} style={{color:'#F93C65',marginLeft:3}}
       >
         Login
       </Text>
@@ -407,14 +420,14 @@ const styles = StyleSheet.create({
   textInput: {
     width: '95%',
     borderWidth: 1,
-    borderRadius: 18,
+    borderRadius: 15,
     borderColor: "#555",
     paddingHorizontal: 8,
     paddingVertical: 10,
     marginBottom: 15,
-    paddingLeft:40
+    paddingLeft:25
   },
   icon:{
-    position:'absolute',left:10,top:15
+    position:'absolute',right:40,top:15
   }
 });

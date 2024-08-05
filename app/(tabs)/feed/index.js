@@ -9,14 +9,71 @@ import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { AuthStore } from "../../../store";
 import { useState } from "react";
 import { useEffect } from "react";
-import Loading from "../../../components/Loading";
-
 
 
 
 
 export const data = [
- 
+  {
+    id: '1',
+    title: 'Ministry Higher Education ',
+    image: require('../../../images/ministries/higherEducation.jpeg'),
+  },
+  {
+    id: '2',
+    title: 'Ministry of Health',
+    image: require('../../../images/ministries/health.jpeg'),
+  },
+  {
+    id: '3',
+    title: 'Ministry of Education',
+    image: require('../../../images/ministries/education.jpeg'),
+  },
+  {
+    id: '4',
+    title: 'Ministry of Finance',
+    image: require('../../../images/ministries/Finance.jpeg'),
+  },
+  {
+    id: '5',
+    title: 'Ministry of Agriculture',
+    image: require('../../../images/ministries/Agriculture.jpeg'),
+  },
+  {
+    id: '6',
+    title: 'Ministry of Transport',
+    image: require('../../../images/ministries/Transport.jpeg'),
+  },
+  {
+    id: '7',
+    title: 'Ministry Local government and community affairs',
+    image: require('../../../images/ministries/Local government.jpeg'),
+  },
+  {
+    id: '8',
+    title: 'Ministry of Humanitarian',
+    image: require('../../../images/ministries/Humanitarian.jpeg'),
+  },
+  {
+    id: '9',
+    title: 'Ministry of Environment',
+    image: require('../../../images/ministries/Environment.jpeg'),
+  },
+  {
+    id: '10',
+    title: ' Ministry of Women affairs',
+    image: require('../../../images/ministries/Women affairs.jpg'),
+  },
+  {
+    id: '11',
+    title: 'Ministry of Agriculture & natural resources',
+    image: require('../../../images/ministries/Agriculture & natural resources.jpeg'),
+  },
+  {
+    id: '12',
+    title: 'Ministry of Commerce and industry ',
+    image: require('../../../images/ministries/Commerce and industry.jpeg'),
+  },
   {
     id: '13',
     title: 'Ministry of Information ',
@@ -81,17 +138,6 @@ export const data = [
 
 
 
-
-const Item = ({ title, image }) => (
-  <View style={styles.itemContainer}>
-    <Image source={image} style={styles.image} />
-    <Text style={styles.text} numberOfLines={6}>
-      {title}
-    </Text>
-  </View>
-);
-
-
 const Tab1Index = () => {
 
 
@@ -100,22 +146,14 @@ const Tab1Index = () => {
   const [post, setPosts] = useState([]);
 
   const user= AuthStore.getRawState().user;
-  const role =AuthStore.getRawState().role
+
 
 
   useEffect(() => {
-    // Fetch the user data first
     getUser();
-  }, []); // Empty dependency array means this runs once when the component mounts
+    fetchMyPosts();
+  }, []);
   
-  useEffect(() => {
-    // Fetch posts only after userData is set
-    if (userData) {
-      fetchMyPosts();
-    }
-  }, [userData]); // This runs whenever userData changes
-  
-
   
   const getUser = async () => {
   
@@ -126,7 +164,6 @@ const Tab1Index = () => {
    if (docSnap.exists()) {
   
      setUserData(docSnap.data());
-    
    } else {
      console.log('No User Data');
    }
@@ -142,32 +179,36 @@ const Tab1Index = () => {
   };
 
   const fetchMyPosts = async () => {
-    if (!userData) return;
-  
     try {
-      let queryCondition;
-      if (userData.role === 'citizen') {
-        queryCondition = query(collection(db, "posts"), where("userId", "==", user.uid));
-      } else if (userData.role === 'ministry') {
-        queryCondition = query(collection(db, "posts"), where("Ministry", "==", userData.fullname));
-      }
+      const querySnapshot = onSnapshot(
+        query(collection(db, "posts"), where("userId", "==", user.uid)), 
+        async (snapShot) => { // Make the callback function async
+          const list = [];
+          for (const doc of snapShot.docs) {
+            let postData = { id: doc.id, ...doc.data() }; // Declare postData using let
+        
+            list.push(postData);
+          
+          }
   
-      const unsubscribe = onSnapshot(queryCondition, (snapshot) => {
-        const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setPosts(list);
-        if (loading) {
-          setLoading(false);
+          setPosts(list);
+  
+          if (loading) {
+            setLoading(false);
+          }
+        },
+        (error) => {
+          // handle the error
         }
-      }, (error) => {
-        console.error('Error fetching posts:', error);
-      });
+      );
   
-      return () => unsubscribe(); // Detach listener when component unmounts
+      return () => {
+        querySnapshot();
+      };
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
   };
-  
   
 
 
@@ -185,19 +226,8 @@ const Tab1Index = () => {
 
 const router = useRouter();
  // Split data into two columns
- const columnData = [data.slice(0, 3), data.slice(3, 6),
-   data.slice(6, 9),data.slice(9, 12)];
-
-
-
-   if (loading) {
-    // Render a loading indicator or any other UI
-    return  <View  style={{height:'100%',alignItems:'center',justifyContent:'center',backgroundColor:'#fff',zIndex:99}}>
-    <Loading size={100} />
-   </View>;
-   
-}
-
+ const columnData = [data.slice(0, 4), data.slice(4, 8),
+   data.slice(8, 12),data.slice(12, 16),data.slice(16, 20),data.slice(20, 24)];
 
   return (
     <View style={{ flex: 1,paddingTop:getStatusBarHeight(),}}>
@@ -210,100 +240,34 @@ const router = useRouter();
     backgroundColor="rgba(255, 255, 255, 0)" // Transparent white color
 />
 
-  
+
 <FlatList
 	data={[{}]}
 	renderItem={() =><>
 
 
-<View style={{backgroundColor:'#fff',marginBottom:15,width:'100%',
- }}>
-
-    <View style={{ justifyContent:'space-between',flexDirection:'row',marginBottom:30}}>
-      
-    <View style={{flexDirection:'row',justifyContent:'center'}}>
-     <Image source={require("../../../images/logo.jpeg")} style={{width:50,height:50,marginTop:13,marginLeft:5}}/>
-     <Text style={{fontSize:28,fontWeight:'bold',marginTop:17,}}>CEPS</Text>
-  </View>
- 
-
-  <Image source={require("../../../images/map.jpeg")} resizeMethod="contain" style={{width:40,height:40,marginTop:15,marginRight:20,}}/>
 
 
- 
-    </View>
-  
-    <View
-        style={{
-          backgroundColor:'#fff',
-          borderColor: '#86939e',
-          borderWidth: 1,
-          width:'95%',
-          margin:10,
-          borderRadius:30
-          
-        }}>
-   <TouchableOpacity >
-        <TextInput
-          editable
-          multiline
-          numberOfLines={1}
-          style={{padding: 10,borderRadius:20}}
-          
-          placeholder= {userData.role ? (userData.role === 'citizen' ? 'Post a Complain' : 'Make a post') : 'Loading...' }
-          onFocus={handlePress}
-        />
-  </TouchableOpacity>
-        </View>
-</View>
-<ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-      <View style={[styles.columnWrapper, styles.firstColumn]}>
-        {renderColumn(columnData[0])}
-      </View>
-      <View style={[styles.columnWrapper, styles.secondColumn]}>
-        {renderColumn(columnData[1])}
-      </View>
-      <View style={[styles.columnWrapper, styles.thirdColumn]}>
-        {renderColumn(columnData[2])}
-      </View>
-      <View style={[styles.columnWrapper, styles.thirdColumn]}>
-        {renderColumn(columnData[3])}
-      </View>
-      <Link href={"../feed"} style={{position:'absolute',bottom:5,right:50}}>
-          <Text style={{alignSelf:'flex-end',fontSize:12,color:'#F93C65'}}>View All</Text>   
-      </Link>
-   
-    </ScrollView>
-  
-
-<View style={{}}>
-<Text style={{fontSize:22,fontWeight:'bold',marginTop:12,backgroundColor:'#fff',
-  padding:12,width:'94%',marginLeft:'3%',marginRight:'3%'}}>
-  
-
-  {userData ? (
-    userData.role === 'citizen' ? 'My Complains' :
-    userData.role === 'ministry' ? 'Ministry Complains' :
-    'Complains'
-  ) : 'Loading...'}
-   </Text>  
+<View style={{marginHorizontal:"6%"}}>
 <FlatList
-  data={post.length ? post : [{ placeholder: true }]}
-  keyExtractor={(item) => item.id || 'placeholder'}
-  renderItem={({ item }) => {
-    if (item.placeholder) {
-      return <Text>No complaints available</Text>;
-    }
-    return (
-      <ComplainBox Title={item.header} date={item.postTime} image={item.images[0]} images={item.images}/>
-      
-    );
-  }}
-/>
- 
-
+              data={data}
+              numColumns={2}
+              keyExtractor={(item) => item.id}
+              renderItem={({item, index}) => {
+                return (
+<View style={{width:'48%',marginLeft:5,marginBottom:8}}>
+<Image source={item.image} style={{width:'98%',
+  height:150,borderRadius:15}}/>
+<Text numberOfLines={3} style={{justifyContent:'center',fontSize:12,marginLeft:4}}>{item.title}</Text>
 
 </View>
+                );
+              }}
+            />
+
+</View>
+
+
 
 </>}
     />
@@ -323,14 +287,13 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   firstColumn: {
-    marginRight: 80, 
+    marginRight: 70, 
   },
   secondColumn: {
     marginRight: 70, 
   },
   thirdColumn: {
-    marginLeft: 15, 
-    marginRight: 102,
+    marginRight: 70, 
   },
 forthColumn: {
   marginRight: 70, 
@@ -349,8 +312,8 @@ forthColumn: {
     marginBottom: 10,
   },
   image: {
-    width: 80,
-    height: 100,
+    width: 70,
+    height: 80,
     borderRadius: 8,
     marginBottom: 5,
   },

@@ -63,7 +63,7 @@ const url ="https://nurmuhass.github.io/muhassConsult_landingPage/"
 const mycustomshare = async () => {
 try {
 const result = await Share.share({
-message:('Download MuhassConsult:'  + '\n' + url),
+message:('Download CEPS:'  + '\n' + url),
 });
 if(result.action === Share.sharedAction){
 if(result.activityType){
@@ -174,16 +174,6 @@ console.log(error.message)
 
        <TouchableOpacity > 
        <View style={styles.items}>
-       <MaterialIcons name="history-toggle-off" size={24} color="black" />
-              <Text style={{fontWeight:'500',marginLeft:7}}>
-              History
-              </Text>
-            
-       </View>
-       </TouchableOpacity>
-
-       <TouchableOpacity > 
-       <View style={styles.items}>
        <Entypo name="notification" size={24} color="black" />
               <Text style={{fontWeight:'500',marginLeft:7}}>
               Notification
@@ -229,7 +219,15 @@ console.log(error.message)
        </View>
        <View style={styles.items}>
        <MaterialCommunityIcons name="logout" size={24} color="black"  />
-       <TouchableOpacity onPress={() => signOut(auth)}
+       <TouchableOpacity onPress={async () => {
+          const resp = await appSignOut();
+          if (!resp?.error) {
+            router.replace("/(auth)/welcome");
+          } else {
+            console.log(resp.error);
+            Alert.alert("Logout Error", resp.error?.message);
+          }
+        }}
 >
               <Text style={{fontWeight:'500',marginLeft:7}}>
               logout

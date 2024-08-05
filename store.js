@@ -12,6 +12,7 @@ export const AuthStore = new Store({
   isLoggedIn: false,
   initialized: false,
   user: null,
+  role:null,
 });
 
 const unsub = onAuthStateChanged(auth, (user) => {

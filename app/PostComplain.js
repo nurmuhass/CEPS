@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Dimensions, FlatList,} from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useRef, useState } from "react";
 import { StatusBar } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -22,7 +22,9 @@ import Toast from '../components/Toast';
 import Loading from '../components/Loading';
 import { getStorage, ref, uploadBytes,getDownloadURL } from "firebase/storage";
 import { Alert } from 'react-native';
-const CHARACTER_LIMIT = 200;
+import { doc, onSnapshot, query, where } from "firebase/firestore";
+import { AuthStore } from '../store';
+const CHARACTER_LIMIT = 300;
 
 const PostComplain = () => {
 
@@ -43,6 +45,10 @@ const PostComplain = () => {
     const richText = useRef();
 
     const user = auth.currentUser;
+
+ 
+    const role =AuthStore.getRawState().role
+
 
     const pickImages = async () => {
       setIsLoading(true);
@@ -76,8 +82,12 @@ const PostComplain = () => {
         richText.current?.setContentHTML(displayContent);
       }
     };
+ 
+ 
     const currentDate = new Date();
-    const formattedTime = currentDate.toLocaleTimeString();
+    const formattedDate = currentDate.toLocaleDateString(); // e.g., "8/1/2024"
+    const formattedTime = currentDate.toLocaleTimeString(); // e.g., "3:37:30 PM"
+    
 
     const validate = () => {
       let isValid = true;
@@ -92,16 +102,18 @@ const PostComplain = () => {
         });
         isValid = false;
       }
-  
-      if (!Ministry) {
-        newErrors.Ministry = 'Please select Ministry';
-        toastRef.current.show({
-          type: 'error',
-          text: "Please select Ministry",
-          duration: 2000,
-        });
-        isValid = false;
-      }
+  if(role ==='citizen'){
+    if (!Ministry) {
+      newErrors.Ministry = 'Please select Ministry';
+      toastRef.current.show({
+        type: 'error',
+        text: "Please select Ministry",
+        duration: 2000,
+      });
+      isValid = false;
+    }
+  }
+      
   
       if (!header) {
         newErrors.header = 'Please Enter Header';
@@ -129,8 +141,13 @@ const PostComplain = () => {
         const extension = filename.split('.').pop(); 
         const name = filename.split('.').slice(0, -1).join('.');
         filename = `${name}_${Date.now()}.${extension}`;
-    
-        const storageRef = ref(storage, `images/${filename}`);
+    let storageRef
+        if(role ==='citizen'){
+
+        storageRef = ref(storage, `images/${filename}`);
+        }{
+          storageRef = ref(storage, `timeline_images/${filename}`);
+        }
         const img = await fetch(uploadUri);
         const bytes = await img.blob();
         
@@ -149,32 +166,46 @@ const PostComplain = () => {
   
     const submitPost = async () => {
       if (!validate()) return;
-
-        setLoading(true);
+    
+      setLoading(true);
       const imageUrls = await uploadImages();
-  
+    
       try {
-        await addDoc(collection(db, "posts"), {
-          userId: user.uid,
-          header: header,
-          Ministry: Ministry,
-          content: content,
-          postTime: formattedTime,
-          images: imageUrls,
-        });
-  
-       
+        if (role === 'citizen') {
+          // If the user is a citizen, add to the "posts" collection
+          await addDoc(collection(db, "posts"), {
+            userId: user.uid,
+            header: header,
+            Ministry: Ministry,
+            content: content,
+            postTime: formattedDate + ' ' + formattedTime,
+            images: imageUrls,
+          });
+        } else if (role !== 'citizen') {
+          // If the user is not a citizen, add to the "timeline" collection
+          await addDoc(collection(db, "timeline"), {
+            userId: user.uid,
+            header: header,
+            Ministry: userData.fullname, // Assuming the Ministry is the fullname of the user
+            content: content,
+            postTime: formattedDate + ' ' + formattedTime,
+            images: imageUrls,
+          });
+        }
+    
         setLoading(false);
-            router.replace("/Success");
-
+        router.replace("/Success");
+    
         setHeader('');
         setContent('');
         setImages([]);
         setMinistry('');
       } catch (error) {
         console.error('Error adding post to Firestore:', error);
+        setLoading(false);
       }
     };
+    
   
     if (loading) {
         // Render a loading indicator or any other UI
@@ -207,7 +238,11 @@ const PostComplain = () => {
     <RichEditor
   ref={richText}
   style={styles.richEditor}
-  placeholder="Write your complaint here..."
+  placeholder=  {
+    role === 'citizen' ? 'Write your complaint here...' :
+    role === 'ministry' ? 'Write your post here...' :
+    'Write your post here...'
+}
   initialContentHTML=""
   onChange={handleContentChange}
   useContainer={true}
@@ -245,7 +280,7 @@ const PostComplain = () => {
             style={{width:'96%',marginBottom:20,borderBottomWidth:1,paddingLeft:20,fontSize:18,marginTop:30,marginLeft:"2%",marginRight:"2%",borderBottomColor:'#555'}}
           />    
 
-    <Picker
+{role === 'citizen' ?   <Picker
     selectedValue={Ministry}
     onValueChange={(itemValue, itemIndex) =>
         setMinistry(itemValue)
@@ -258,7 +293,12 @@ const PostComplain = () => {
         <Picker.Item label={item.title} value={item.title}  key={item.id}/>
     )})}
     
-    </Picker>
+    </Picker>  :
+    role === 'ministry' ? '' :
+    ''
+  }
+
+
 
 
     

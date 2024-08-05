@@ -348,7 +348,7 @@ const bytes =await img.blob();
                             marginTop: 18,
                             marginBottom: 4,
                            width:'80%',
-                           alignSelf:'center'
+                           alignSelf:'center',
                         }}
                     />
                     </ScrollView>    
@@ -361,11 +361,10 @@ const bytes =await img.blob();
 
 const styles = StyleSheet.create({
     container:{
-   paddingTop:getStatusBarHeight(),
+        paddingTop:getStatusBarHeight(),
         backgroundColor:"#f0f0f0",
         paddingBottom:5,
-        flex:1,
-        
+        flex:1,  
     },
     input: {
       height: 40,

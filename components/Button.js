@@ -4,10 +4,10 @@ import { colors } from '../constants/Styles';
 
 
 const Button = (props) => {
-    const filledBgColor = props.color || '#1F41BB';
+    const filledBgColor = props.color || '#F93C65';
     const outlinedColor = "#fff";
     const bgColor = props.filled ? filledBgColor : outlinedColor;
-    const textColor = props.filled ? "#fff" : '#1F41BB';
+    const textColor = props.filled ? "#fff" : '#F93C65';
 
 
     const isLoading = props.isLoading || false
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     button: {
         paddingBottom: 16,
         paddingVertical: 10,
-        borderColor: '#1F41BB',
+        borderColor: '#F93C65',
         borderWidth: 2,
         borderRadius: 12,
         alignItems: 'center',

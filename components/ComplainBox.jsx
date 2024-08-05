@@ -15,8 +15,8 @@ const ComplainBox = ({Title,date,image,images}) => {
   <Image source={{uri: images[0]}} style={{width:70,height:90,borderRadius:8,borderWidth:0.8,borderColor:'#e1e8ee'}}/>
 )}
            
-            <View style={{justifyContent:'center',marginLeft:10}}>
-<Text style={{fontSize:20,fontWeight:"800"}} numberOfLines={1}>{Title}</Text>
+            <View style={{justifyContent:'center',marginLeft:10,width:'80%',}}>
+<Text style={{fontSize:18,fontWeight:"700",flexWrap: 'wrap',lineHeight:20,paddingRight:20}} numberOfLines={3}>{Title}</Text>
 
 <Text>{date}</Text>
             </View>

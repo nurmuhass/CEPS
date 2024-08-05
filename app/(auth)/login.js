@@ -1,4 +1,4 @@
-import { Text, View, TextInput, StyleSheet, Alert } from "react-native";
+import { Text, View, TextInput, StyleSheet, Alert, Image } from "react-native";
 import { AuthStore, } from "../../store.js";
 import { Stack, useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -10,12 +10,13 @@ import Feather from '@expo/vector-icons/Feather';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import { Button } from "@rneui/themed";
 import { TouchableOpacity } from "react-native";
+import Checkbox from "expo-checkbox"
 import Loader from "../../components/Loader.js";
 import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth } from "../../firebase-config.js";
-
+import { auth, db } from "../../firebase-config.js";
+import { doc, onSnapshot } from 'firebase/firestore';
 export default function LogIn() {
   const router = useRouter();
   const emailRef = useRef("");
@@ -23,8 +24,8 @@ export default function LogIn() {
   const [loading, setLoading] = useState(false);
   const toastRef = useRef(); 
   const [errors, setErrors] = useState({});
-
-
+  const [isChecked, setIsChecked] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   const validate = async () => {
     let isValid = true;
@@ -93,18 +94,46 @@ export default function LogIn() {
     try {
       setLoading(true);
       const resp = await signInWithEmailAndPassword(auth, email, password);
+  
+      const getUser = () => {
+        return new Promise((resolve, reject) => {
+          const docRef = doc(db, 'users', resp.user.uid);
+          const unsubscribe = onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+              setUserData(docSnap.data());
+              resolve(docSnap.data());
+            } else {
+              console.log('No User Data');
+              resolve(null);
+            }
+          }, reject);
+  
+          // Return the unsubscribe function to detach the listener when done
+          return () => {
+            unsubscribe();
+          };
+        });
+      };
+  
+      // Wait for userData to be fetched
+      const fetchedUserData = await getUser();
+  
       AuthStore.update((store) => {
         store.user = resp.user;
-        store.isLoggedIn = resp.user ? true : false;
+        store.isLoggedIn = !!resp.user;
+        store.role = fetchedUserData ? fetchedUserData.role : null;
+        console.log(store.role);
       });
-      return { user: auth.currentUser };
+  
       setLoading(false);
+      return { user: auth.currentUser };
+  
     } catch (e) {
       setLoading(false);
       return { error: e };
-     
     }
   };
+  
 
 
 
@@ -127,11 +156,16 @@ export default function LogIn() {
     <Ionicons name="chevron-back" size={18} color="black" />
   </TouchableOpacity>
   
-  <View style={{marginTop:20}}>
-    <Text style={{fontSize:32,fontWeight:'bold'}}>Hey, </Text>
-    <Text style={{fontSize:32,fontWeight:'bold'}}>Welcome Back</Text>
+  <View style={{marginTop:40,alignItems:'center'}}>
+      <Image source={require("../../images/map.jpeg")} style={{width:80,height:70}}/>
   </View>
-  <Text style={{marginTop:40,color:'#555',fontSize:15}}>Please login to continue</Text>
+
+
+  <View style={{marginTop:20,alignItems:'center',marginBottom:30}}>
+    <Text style={{fontSize:30,fontWeight:'bold'}}>Welcome back</Text>
+    <Text style={{marginTop:5,color:'#555',fontSize:17,}}>sign in to access your account</Text>
+  </View>
+  
   <Toast ref={toastRef} topValue={50} />
   
   <View style={{justifyContent:'center',marginTop:15}}>
@@ -167,27 +201,77 @@ export default function LogIn() {
    </View>
         </View>
   
-<View>
-               <Text style={{marginRight:5,fontWeight:'bold',fontSize:14,marginLeft:'65%'}}>Forget Password?</Text>
-</View>
-       
+        <View style={{
+                    flexDirection: 'row',
+                    marginVertical: 6,
+                    marginHorizontal:10,
+                    justifyContent:'space-between',
+                    alignItems:'center'
+                }}>
+        <View style={{
+                    flexDirection: 'row',
+                    marginVertical: 6
+                }}>
+                    <Checkbox
+                        style={{ marginRight: 8 }}
+                        value={isChecked}
+                        onValueChange={setIsChecked}
+                        color={isChecked ? '#F93C65' : undefined}
+                    />
 
-{loading ? 
+                    <Text>Remember me</Text>
+                </View>
+
+               <Text style={{marginRight:5,fontWeight:'semiBold',fontSize:14,color:'#F93C65'}}>Forget Password?</Text>
+</View>
+
+  
+  <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
+                    <View
+                        style={{
+                            flex: 1,
+                            height: 1,
+                            backgroundColor: 'grey',
+                            marginHorizontal: 10
+                        }}
+                    />
+                    <Text style={{ fontSize: 14,color:'grey' }}>Or continue with</Text>
+                    <View
+                        style={{
+                            flex: 1,
+                            height: 1,
+                            backgroundColor: 'grey',
+                            marginHorizontal: 10
+                        }}
+                    />
+                </View>
+
+<View style={{justifyContent:'space-evenly',flexDirection:'row',marginVertical:12}}>
+<Image source={require("../../images/google.png")} style={{width:30,height:30}}/>
+<Image source={require("../../images/facebook.png")} style={{width:30,height:30}}/>
+<Image source={require("../../images/twitter.png")} style={{width:30,height:30}}/>
+
+</View>
+
+
+
+                {loading ? 
   <View style={{marginTop:10,width:'90%',padding:15,
-      backgroundColor:'#fff',color:'#00C26F',borderRadius:20,shadowColor:'#3E3E3E',
+      backgroundColor:'#fff',color:'#F93C65',borderRadius:20,shadowColor:'#3E3E3E',
       shadowOffset:{width:0,height:10},shadowOpacity:0.2,shadowRadius:8,elevation:4,alignItems:'center',justifyContent:'center'}}>
         <Loader/>
     </View>
 :
 
 <Button
-buttonStyle={{marginTop:10,width:'90%',padding:15,
-  backgroundColor:'#00C26F',color:'#fff',borderRadius:20,shadowColor:'#3E3E3E',shadowOffset:{width:0,height:10},shadowOpacity:0.2,shadowRadius:8,elevation:4}}
+buttonStyle={{marginTop:10,width:'90%',padding:15,fontSize:28,
+  backgroundColor:'#F93C65',color:'#fff',borderRadius:10,shadowColor:'#3E3E3E',shadowOffset:{width:0,height:10},shadowOpacity:0.2,shadowRadius:8,elevation:4}}
 
   onPress={validate}
 
 >
-  Login
+  Next
+  <Ionicons name="chevron-forward" size={20} color="white" style={{marginLeft:5}}/>
 </Button>
 
 }
@@ -196,16 +280,17 @@ buttonStyle={{marginTop:10,width:'90%',padding:15,
 
 
   <View style={{marginTop:30,flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
-    <Text>Don't have an account!</Text>
+    <Text>New Member?</Text>
   <Text
                  onPress={() => {        
                   router.push("/create-account");
-                }} style={{color:'#00C26F',marginLeft:3}}
+                }} style={{color:'#F93C65',marginLeft:3}}
         >
-         Sign up
+        Register now
         </Text>
   </View>
-  
+
+
         </View>
       </View>
 
@@ -219,14 +304,14 @@ const styles = StyleSheet.create({
   textInput: {
     width: '92%',
     borderWidth: 1,
-    borderRadius: 18,
+    borderRadius: 15,
     borderColor: "#555",
     paddingHorizontal: 8,
     paddingVertical: 10,
     marginBottom: 15,
-    paddingLeft:40
+    paddingLeft:30
   },
   icon:{
-    position:'absolute',left:10,top:15
+    position:'absolute',right:40,top:15
   }
 });
