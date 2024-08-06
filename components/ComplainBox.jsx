@@ -1,9 +1,10 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image, TouchableOpacity } from 'react-native'
 import React from 'react' 
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
+import { Link } from 'expo-router';
 
-const ComplainBox = ({Title,date,image,images}) => {
+const ComplainBox = ({Title,date,image,images,id}) => {
   return (
     <View style={{backgroundColor:'#fff',width:'94%',padding:15,borderRadius:10,marginBottom:12,
     marginLeft:'3%',marginRight:'3%'}}>
@@ -29,12 +30,21 @@ const ComplainBox = ({Title,date,image,images}) => {
   <View style={{flexDirection:'row',alignItems:'center'}}>
       
       <AntDesign name="edit" size={18} color="black" />
-      <Text style={{marginLeft:2}}>Edit</Text>
+      <Link href={`../(tabs)/home/edit/${id}`} asChild>
+      <TouchableOpacity>
+           <Text style={{marginLeft:2}}>Edit</Text>
+      </TouchableOpacity>
+      </Link>
   </View>
-
+  
   <View style={{flexDirection:'row'}}>
       <AntDesign name="eyeo" size={18} color="black" />
-      <Text style={{marginLeft:2}}>View</Text>
+      <Link href={`../(tabs)/home/view/${id}`} asChild>
+      <TouchableOpacity>
+           <Text style={{marginLeft:2}}>View</Text>
+      </TouchableOpacity>
+      </Link>
+      {/* <Link href={`/SingUpDoctorsPage/${id}/verify`}> */}
   </View>
 
 

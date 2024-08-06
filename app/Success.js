@@ -7,15 +7,39 @@ import { AuthStore } from '../store';
 
 
 const Success = () => {
-
+  const [userData, setUserData] = useState(null);
     const router  = useRouter()
 
     const handlePress = () => {
         router.replace("/(tabs)/home");
       };
 
-
-      const role =AuthStore.getRawState().role
+      const [loading, setLoading] = useState(false);
+      const user = auth.currentUser;
+      const role = AuthStore.getRawState().role; // Adjust as needed
+    
+      const getUser = async () => {
+        const docRef = doc(db, 'users', user.uid);
+    
+        const unsubscribe = onSnapshot(docRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          } else {
+            console.log('No User Data');
+          }
+          setLoading(false);
+        });
+    
+        // This will detach the listener when the component is unmounted
+        return () => {
+          unsubscribe();
+        };
+      };
+    
+      useEffect(() => {
+        getUser();
+      }, []); // Empty dependency array means this runs once when the component mounts
+    
 
   return (
     <View style={styles.container}>
@@ -25,11 +49,11 @@ const Success = () => {
                  backgroundColor="#555"
               />
       <Image source={require('../images/checked.png')} style={styles.success} />
-      { role === 'citizen'?
+      {userData?.role  === 'citizen'?
 
 <View>
-<Text sstyle={{...styles.msg,alignSelf:'center'}}>{'Your Complain have'}</Text>
-<Text style={{...styles.msg,marginTop:2}}>{'been submitted succesfully'}</Text>
+<Text sstyle={{...styles.msg,alignSelf:'center'}}>{'Your Complain have been'}</Text>
+<Text style={{...styles.msg,marginTop:2}}>{'submitted succesfully'}</Text>
 </View>
 
 :

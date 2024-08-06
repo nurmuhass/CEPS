@@ -104,7 +104,7 @@ console.log(error.message)
       /> */}
 
 <View style={{justifyContent:'space-between',flexDirection:'row'}}>
-      <Text style={{marginLeft:10,fontSize:20,fontWeight:"bold",marginTop:5}}>Profile</Text>
+      <Text style={{marginLeft:10,fontSize:20,fontWeight:"bold",marginTop:5,color:'#555'}}>Profile</Text>
 
 
 <TouchableOpacity  onPress={async () => {
@@ -118,7 +118,7 @@ console.log(error.message)
         }}>
 
 <View style={{ flexDirection: "row", alignItems: "center" }}>
-    <MaterialCommunityIcons name="logout" size={24} color="black" style={{ marginRight: 13, marginTop: 3 }} />
+    <MaterialCommunityIcons name="logout" size={24} color="#F93C65" style={{ marginRight: 13, marginTop: 3 }} />
   </View> 
 </TouchableOpacity>
 

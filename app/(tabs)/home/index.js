@@ -10,7 +10,7 @@ import { AuthStore } from "../../../store";
 import { useState } from "react";
 import { useEffect } from "react";
 import Loading from "../../../components/Loading";
-
+import Entypo from '@expo/vector-icons/Entypo';
 
 
 
@@ -292,10 +292,25 @@ const router = useRouter();
   keyExtractor={(item) => item.id || 'placeholder'}
   renderItem={({ item }) => {
     if (item.placeholder) {
-      return <Text>No complaints available</Text>;
+      return(
+        <View style={{justifyContent:'center',alignItems:'center',flex:1,backgroundColor:'#fff',height:200}}>
+      
+    
+      <Entypo name="emoji-happy" size={72} color="black" />
+        <Text style={{marginVertical:5}}>No Complains</Text>
+        
+  {userData ? (
+    userData.role === 'citizen' ?      <Text style={{alignSelf:'center'}}>You Currently did not Submit any Complains</Text> :
+    userData.role === 'ministry' ?      <Text style={{alignSelf:'center'}}>There are Currently no Complains Submitted</Text> :
+    <Text style={{alignSelf:'center'}}>There are Currently no Complains Submitted</Text>
+  ) : 'Loading...'}
+   
+        
+        </View>
+      )
     }
     return (
-      <ComplainBox Title={item.header} date={item.postTime} image={item.images[0]} images={item.images}/>
+      <ComplainBox Title={item.header} date={item.postTime} image={item.images[0]} images={item.images} id={item.id}/>
       
     );
   }}
