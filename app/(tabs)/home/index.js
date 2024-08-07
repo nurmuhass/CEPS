@@ -11,15 +11,16 @@ import { useState } from "react";
 import { useEffect } from "react";
 import Loading from "../../../components/Loading";
 import Entypo from '@expo/vector-icons/Entypo';
-
-
+import {Picker} from '@react-native-picker/picker';
+import {datas} from "../feed/"
 
 
 export const data = [
- 
+
+  
   {
     id: '13',
-    title: 'Ministry of Information ',
+    title: 'Ministry of Information',
     image: require('../../../images/ministries/Information.jpeg'),
   },
   {
@@ -98,6 +99,7 @@ const Tab1Index = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [post, setPosts] = useState([]);
+  const [selectedMinistry, setSelectedMinistry] = useState(null);
 
   const user= AuthStore.getRawState().user;
   const role =AuthStore.getRawState().role
@@ -108,13 +110,12 @@ const Tab1Index = () => {
     getUser();
   }, []); // Empty dependency array means this runs once when the component mounts
   
+
   useEffect(() => {
-    // Fetch posts only after userData is set
     if (userData) {
       fetchMyPosts();
     }
-  }, [userData]); // This runs whenever userData changes
-  
+  }, [userData, selectedMinistry]);
 
   
   const getUser = async () => {
@@ -140,16 +141,25 @@ const Tab1Index = () => {
    unsubscribe();
   };
   };
-
   const fetchMyPosts = async () => {
     if (!userData) return;
   
     try {
       let queryCondition;
+  
       if (userData.role === 'citizen') {
         queryCondition = query(collection(db, "posts"), where("userId", "==", user.uid));
       } else if (userData.role === 'ministry') {
         queryCondition = query(collection(db, "posts"), where("Ministry", "==", userData.fullname));
+      } else if (userData.role === 'Governor') {
+        if (selectedMinistry === 'All Ministries') {
+          // Fetch all posts when "All Ministries" is selected
+          queryCondition = collection(db, "posts");
+        } else if (selectedMinistry === null) {
+          queryCondition = collection(db, "posts");
+        } else {
+          queryCondition = query(collection(db, "posts"), where("Ministry", "==", selectedMinistry));
+        }
       }
   
       const unsubscribe = onSnapshot(queryCondition, (snapshot) => {
@@ -167,7 +177,6 @@ const Tab1Index = () => {
       console.error('Error fetching posts:', error);
     }
   };
-  
   
 
 
@@ -287,6 +296,22 @@ const router = useRouter();
     'Complains'
   ) : 'Loading...'}
    </Text>  
+   {userData.role === 'Governor' && (
+  <View style={{ padding: 10 }}>
+   <Picker
+  selectedValue={selectedMinistry}
+  onValueChange={(itemValue) => setSelectedMinistry(itemValue)}
+  style={{ height: 50, width: '100%' }}
+>
+  <Picker.Item label="All Ministries" value={null || 'All Ministries'} />
+  {datas.map((item) => (
+    <Picker.Item label={item.title} value={item.title} key={item.id} />
+  ))}
+</Picker>
+
+    
+  </View>
+)}
 <FlatList
   data={post.length ? post : [{ placeholder: true }]}
   keyExtractor={(item) => item.id || 'placeholder'}

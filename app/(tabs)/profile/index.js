@@ -151,7 +151,10 @@ console.log(error.message)
       <ScrollView>
 
 
-   <View style={{marginVertical:30}}>
+   <View style={{marginVertical:20}}>
+
+     
+   <Image source={require("../../../images/Group 708.png")} style={{width:'92%',alignSelf:'center',marginTop:10,}}/>
 
 <Link href="/../accountSettings" style={styles.items}>
      
@@ -172,18 +175,10 @@ console.log(error.message)
  </TouchableOpacity>
    
 
-       <TouchableOpacity > 
-       <View style={styles.items}>
-       <Entypo name="notification" size={24} color="black" />
-              <Text style={{fontWeight:'500',marginLeft:7}}>
-              Notification
-              </Text>
-            
-       </View>
-       </TouchableOpacity>
+      
 
        <TouchableOpacity onPress={mycustomshare}> 
-          <View style={styles.items}>
+          <View style={{...styles.items,borderBottomWidth:0.5}}>
           <Entypo name="creative-commons-sharealike" size={24} color="black" />
                   <Text style={{fontWeight:'500',marginLeft:7}}>
                   Invite People
@@ -192,51 +187,8 @@ console.log(error.message)
           </View>
        </TouchableOpacity>
 
-       <TouchableOpacity > 
-          <View style={styles.items}>
-          <Entypo name="new-message" size={24} color="black" />
-                  <Text style={{fontWeight:'500',marginLeft:7}}>
-                  Contact Us
-                  </Text>
-                
-          </View>
-       </TouchableOpacity>
-       
-
-       <View style={styles.items}>
-       <MaterialIcons name="policy" size={24} color="black" />
-              <Text style={{fontWeight:'500',marginLeft:7}}>
-              Privacy Policy
-              </Text>
-            
-       </View>
-       <View style={styles.items}>
-       <FontAwesome5 name="file-signature" size={24} color="black" />
-              <Text style={{fontWeight:'500',marginLeft:7}}>
-              Terms and Conditions
-              </Text>
-            
-       </View>
-       <View style={styles.items}>
-       <MaterialCommunityIcons name="logout" size={24} color="black"  />
-       <TouchableOpacity onPress={async () => {
-          const resp = await appSignOut();
-          if (!resp?.error) {
-            router.replace("/(auth)/welcome");
-          } else {
-            console.log(resp.error);
-            Alert.alert("Logout Error", resp.error?.message);
-          }
-        }}
->
-              <Text style={{fontWeight:'500',marginLeft:7}}>
-              logout
-              </Text>
-       </TouchableOpacity>
-       </View>
 
 
-       
 
 
       </View>

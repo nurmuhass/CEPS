@@ -47,9 +47,9 @@ const BottomLoginSheet = () => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 5,
     width: '100%',
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
     padding: 26,
     gap: 14,
     borderTopRightRadius: 20,
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   btnDark: {
-    backgroundColor: ColorPalette.grey,
+    backgroundColor: '#f93c65',
   },
   btnDarkText: {
     color: '#fff',

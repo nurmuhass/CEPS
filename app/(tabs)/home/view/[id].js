@@ -102,6 +102,8 @@ const ViewPost = () => {
               where("Ministry", "==", userData.fullname),
           
             );
+          }else if (userData.role === 'Governor') {
+            queryCondition = collection(db, "posts");
           }
       
           const unsubscribe = onSnapshot(queryCondition, (snapshot) => {

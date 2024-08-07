@@ -13,7 +13,7 @@ import { useEffect } from "react";
 
 
 
-export const data = [
+export const datas = [
   {
     id: '1',
     title: 'Ministry Higher Education ',
@@ -226,8 +226,8 @@ const Tab1Index = () => {
 
 const router = useRouter();
  // Split data into two columns
- const columnData = [data.slice(0, 4), data.slice(4, 8),
-   data.slice(8, 12),data.slice(12, 16),data.slice(16, 20),data.slice(20, 24)];
+ const columnData = [datas.slice(0, 4), datas.slice(4, 8),
+   datas.slice(8, 12),datas.slice(12, 16),datas.slice(16, 20),datas.slice(20, 24)];
 
   return (
     <View style={{ flex: 1,paddingTop:getStatusBarHeight(),}}>
@@ -250,7 +250,7 @@ const router = useRouter();
 
 <View style={{marginHorizontal:"6%"}}>
 <FlatList
-              data={data}
+              data={datas}
               numColumns={2}
               keyExtractor={(item) => item.id}
               renderItem={({item, index}) => {
