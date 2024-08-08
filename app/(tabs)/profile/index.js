@@ -16,6 +16,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { StatusBar } from 'react-native';
 import { db } from "../../../firebase-config";
 import { getStatusBarHeight } from "react-native-status-bar-height";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 
 const Tab2Index = () => {
@@ -24,15 +25,23 @@ const Tab2Index = () => {
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [postCounts, setPostCounts] = useState({ pending: 0, completed: 0, active: 0, total: 0 });
   const user= AuthStore.getRawState().user;
 
 
+  
+  useEffect(() => {
+    // Fetch the user data first
+    getUser();
+  }, []); // Empty dependency array means this runs once when the component mounts
+  
 
   useEffect(() => {
-    getUser();
-  }, []);
-  
+    if (userData) {
+      fetchPostsCounts();
+    }
+  }, [userData]);
+
   
   const getUser = async () => {
   
@@ -43,6 +52,7 @@ const Tab2Index = () => {
    if (docSnap.exists()) {
   
      setUserData(docSnap.data());
+    
    } else {
      console.log('No User Data');
    }
@@ -56,6 +66,59 @@ const Tab2Index = () => {
    unsubscribe();
   };
   };
+  const fetchPostsCounts = async () => {
+    if (!userData) return;
+  
+    const statuses = ['pending', 'Completed', 'Active'];
+    const counts = { pending: 0, completed: 0, active: 0, total: 0 };
+  
+    try {
+      // Create and fetch count for each status
+      for (const status of statuses) {
+        let queryCondition;
+  
+        if (userData.role === 'citizen') {
+          queryCondition = query(collection(db, "posts"), 
+            where("userId", "==", user.uid), 
+            where("status", "==", status));
+        } else if (userData.role === 'ministry') {
+          queryCondition = query(collection(db, "posts"), 
+            where("Ministry", "==", userData.fullname), 
+            where("status", "==", status));
+        } else if (userData.role === 'Governor') {
+          queryCondition = query(collection(db, "posts"), 
+            where("status", "==", status));
+        }
+  
+        const snapshot = await getDocs(queryCondition);
+        counts[status] = snapshot.size; // Get the count of documents
+      }
+  
+      // Create and fetch count for all posts
+      let queryCondition;
+  
+      if (userData.role === 'citizen') {
+        queryCondition = query(collection(db, "posts"), where("userId", "==", user.uid));
+      } else if (userData.role === 'ministry') {
+        queryCondition = query(collection(db, "posts"), where("Ministry", "==", userData.fullname));
+      } else if (userData.role === 'Governor') {
+        queryCondition = query(collection(db, "posts"));
+      }
+  
+      const totalSnapshot = await getDocs(queryCondition);
+      counts.total = totalSnapshot.size; // Get the total count of documents
+  
+ 
+      setPostCounts(counts)
+      // You can update the state or handle counts as needed
+      // setPostCounts(counts);
+  
+    } catch (error) {
+      console.error('Error fetching post counts:', error);
+    }
+  };
+  
+  
 
 
 const url ="https://nurmuhass.github.io/muhassConsult_landingPage/"
@@ -79,6 +142,13 @@ console.log('disabled')
 console.log(error.message)
 }
 }
+
+const handlePress = (route) => {
+  // Use the parameter to determine which route to navigate to
+  router.replace(route);
+};
+
+
 
   return (
     <View style={{ flex: 1,justifyContent:'center',   paddingTop:getStatusBarHeight(),}}>
@@ -149,6 +219,62 @@ console.log(error.message)
       </View>
 
       <ScrollView>
+
+<View style={{flexDirection:'row',marginTop:10}}>
+
+<TouchableOpacity onPress={() => handlePress('../(tabs)/home')} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
+  <View style={{marginTop:20}}>
+      <Text style={{marginLeft:15}}>Total Cases</Text>
+      <Text style={{fontWeight:'bold',fontSize:20,fontSize:30,alignSelf:'center',marginTop:10}}>{postCounts.total}</Text>
+  </View>
+
+  <View style={{backgroundColor:'#18B368',height:35,width:35,marginTop:35,justifyContent:'center',alignItems:'center',marginRight:10,borderRadius:4}}>
+  <MaterialIcons name="fullscreen-exit" size={22} color="#fff" />
+</View>
+</TouchableOpacity>
+
+<TouchableOpacity onPress={() => handlePress('/../ActiveProject')} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
+  <View style={{marginTop:20}}>
+      <Text style={{marginLeft:15}}>Active Cases</Text>
+      <Text style={{fontWeight:'bold',fontSize:20,fontSize:30,alignSelf:'center',marginTop:10}}>{postCounts.Active}</Text>
+  </View>
+
+  <View style={{backgroundColor:'#FFF5D9',height:35,width:35,marginTop:35,justifyContent:'center',alignItems:'center',marginRight:10,borderRadius:4}}>
+  <AntDesign name="linechart" size={22} color="#FFBB38" />
+</View>
+</TouchableOpacity>
+
+
+
+</View>
+
+<View style={{flexDirection:'row',marginTop:10}}>
+
+<TouchableOpacity onPress={() => handlePress('/../PendingProjects')} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
+  <View style={{marginTop:20}}>
+      <Text style={{marginLeft:15}}>Pending Cases</Text>
+      <Text style={{fontWeight:'bold',fontSize:20,fontSize:30,alignSelf:'center',marginTop:10}}>{postCounts.pending}</Text>
+  </View>
+
+  <View style={{backgroundColor:'#FFDED1',height:35,width:35,marginTop:35,justifyContent:'center',alignItems:'center',marginRight:10,borderRadius:4}}>
+  <Image source={require("../../../images/icon.png")}/>
+</View>
+</TouchableOpacity>
+
+<TouchableOpacity onPress={() => handlePress('/../CompletedProjects')} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
+  <View style={{marginTop:20}}>
+      <Text style={{marginLeft:15}}>Completed Cases</Text>
+      <Text style={{fontWeight:'bold',fontSize:20,fontSize:30,alignSelf:'center',marginTop:10}}>{postCounts.Completed}</Text>
+  </View>
+
+  <View style={{backgroundColor:'#E7EDFF',height:35,width:35,marginTop:35,justifyContent:'center',alignItems:'center',marginRight:10,borderRadius:4}}>
+  <Ionicons name="checkmark-done" size={22} color="#396AFF" />
+</View>
+</TouchableOpacity>
+
+
+
+</View>
 
 
    <View style={{marginVertical:20}}>

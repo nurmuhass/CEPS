@@ -16,7 +16,7 @@ import { useEffect } from "react";
 export const datas = [
   {
     id: '1',
-    title: 'Ministry Higher Education ',
+    title: 'Ministry Higher Education',
     image: require('../../../images/ministries/higherEducation.jpeg'),
   },
   {
@@ -76,7 +76,7 @@ export const datas = [
   },
   {
     id: '13',
-    title: 'Ministry of Information ',
+    title: 'Ministry of Information',
     image: require('../../../images/ministries/Information.jpeg'),
   },
   {

@@ -330,14 +330,19 @@ if (loading) {
         </View>
 
         <View style={{marginLeft:10}}>
+        <Link href={"../../../ActiveProject"} asChild>
             <Text style={{fontWeight:'bold'}}>Active Projects</Text>
+            </Link>
             <Text style={{fontSize:12,color:'grey'}}>28 january 2021</Text>
         </View>
 
 </View>
 
 <View style={{marginRight:5}}>
-    <Text style={{color:'grey'}}>view</Text>
+  <Link href={"../../../ActiveProject"} asChild>
+     <Text style={{color:'grey'}}>view</Text>
+  </Link>
+    
 </View>
 
 </View>
@@ -353,14 +358,18 @@ if (loading) {
         </View>
 
         <View style={{marginLeft:10}}>
+        <Link href={"../../../CompletedProjects"} asChild>
             <Text style={{fontWeight:'bold'}}>Completed Projects</Text>
+         </Link>
             <Text style={{fontSize:12,color:'grey'}}>28 january 2021</Text>
         </View>
 
 </View>
 
 <View style={{marginRight:5}}>
+<Link href={"../../../CompletedProjects"} asChild>
     <Text style={{color:'grey'}}>view</Text>
+    </Link>
 </View>
 
 </View>
@@ -376,14 +385,18 @@ if (loading) {
         </View>
 
         <View style={{marginLeft:10}}>
+        <Link href={"../../../PendingProjects"} asChild>
             <Text style={{fontWeight:'bold'}}>Pending Projects</Text>
+        </Link>
             <Text style={{fontSize:12,color:'grey'}}>28 january 2021</Text>
         </View>
 
 </View>
 
 <View style={{marginRight:5}}>
+<Link href={"../../../PendingProjects"} asChild>
     <Text style={{color:'grey'}}>view</Text>
+    </Link>
 </View>
 
 </View>
