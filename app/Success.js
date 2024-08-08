@@ -43,11 +43,11 @@ const Success = () => {
 
   return (
     <View style={styles.container}>
-          <StatusBar
-                 translucent
-                 barStyle="light-content"
-                 backgroundColor="#555"
-              />
+      <StatusBar
+        translucent
+        barStyle="dark-content"
+        backgroundColor="rgba(255, 255, 255, 0)"
+      />
       <Image source={require('../images/checked.png')} style={styles.success} />
       {userData?.role  === 'citizen'?
 

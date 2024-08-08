@@ -3,6 +3,7 @@ import { useRouter, useSegments } from "expo-router";
 import { AuthStore, initStore } from "../store";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
+import { Image } from "react-native";
 
 const Index = () => {
 
@@ -32,6 +33,6 @@ const Index = () => {
     }
   }, [segments, navigationState?.key, initialized]);
 
-  return <View>{!navigationState?.key ? <Text>LOADING...</Text> : <></>}</View>;
+  return <View>{!navigationState?.key ? <Image source={require("../assets/images/splash.png")} style={{height:'100%',width:'100%'}}/> : <></>}</View>;
 };
 export default Index;

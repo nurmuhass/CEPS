@@ -39,7 +39,7 @@ const ComplainBox = ({Title,date,image,images,id}) => {
   
   <View style={{flexDirection:'row'}}>
       <AntDesign name="eyeo" size={18} color="black" />
-      <Link href={`../(tabs)/home/view/${id}`} asChild>
+      <Link href={`../../view/${id}`} asChild>
       <TouchableOpacity>
            <Text style={{marginLeft:2}}>View</Text>
       </TouchableOpacity>

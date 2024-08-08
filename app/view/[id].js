@@ -3,14 +3,15 @@ import Swiper from 'react-native-swiper';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { collection, doc, getDoc, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
-import { db } from '../../../../firebase-config';
+// import { db } from '../../firebase-config';
 import RenderHTML from 'react-native-render-html';
 import { FlatList } from 'react-native';
-import { AuthStore } from '../../../../store';
+import { AuthStore } from '../../store';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRoute } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native';
+import { db } from '../../firebase-config';
 const ViewPost = () => {
     const { id } = useLocalSearchParams();
     const [loading, setLoading] = useState(true);
@@ -381,11 +382,11 @@ if (loading) {
 
         <View style={{padding:10,backgroundColor:'#FFDED1',borderRadius:25}}>
            
-            <Image source={require("../../../../images/icon.png")}/>
+            <Image source={require("../../images/icon.png")}/>
         </View>
 
         <View style={{marginLeft:10}}>
-        <Link href={"../../../PendingProjects"} asChild>
+        <Link href={"../PendingProjects"} asChild>
             <Text style={{fontWeight:'bold'}}>Pending Projects</Text>
         </Link>
             <Text style={{fontSize:12,color:'grey'}}>28 january 2021</Text>
@@ -394,7 +395,7 @@ if (loading) {
 </View>
 
 <View style={{marginRight:5}}>
-<Link href={"../../../PendingProjects"} asChild>
+<Link href={"../PendingProjects"} asChild>
     <Text style={{color:'grey'}}>view</Text>
     </Link>
 </View>

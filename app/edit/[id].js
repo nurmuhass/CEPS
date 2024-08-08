@@ -15,16 +15,16 @@ import { Image } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import Entypo from '@expo/vector-icons/Entypo';
 import { TextInput } from 'react-native';
-import { auth, db, storage } from '../../../../firebase-config';
+import { auth, db, storage } from '../../firebase-config';
 import { addDoc, collection, getDoc, updateDoc } from 'firebase/firestore';
 import { doc, onSnapshot, query, where } from "firebase/firestore";
 import { getStorage, ref, uploadBytes,getDownloadURL } from "firebase/storage";
 import { Alert } from 'react-native';
 
-import Toast from '../../../../components/Toast';
-import { data } from '../';
-import { AuthStore } from '../../../../store';
-import Loading from '../../../../components/Loading';
+import Toast from '../../components/Toast';
+import { data } from '../(tabs)/home';
+import { AuthStore } from '../../store';
+import Loading from '../../components/Loading';
 const CHARACTER_LIMIT = 300;
 
 const edit = () => {
@@ -177,7 +177,7 @@ const edit = () => {
   
           </>
         ) : (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color="#F93C65" />
         )}
       </View>
     );

@@ -1,4 +1,4 @@
-import { View, Text, Image, FlatList, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Image, FlatList, StyleSheet, Dimensions, StatusBar } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -202,7 +202,11 @@ const renderItem = ({ item }) => (
 
   return (
     <View>
-
+     <StatusBar
+        translucent
+        barStyle="dark-content"
+        backgroundColor="rgba(255, 255, 255, 0)"
+      />
 
  <FlatList
       data={timeline}

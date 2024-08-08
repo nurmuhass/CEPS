@@ -143,15 +143,18 @@ console.log(error.message)
 }
 }
 
-const handlePress = (route) => {
-  // Use the parameter to determine which route to navigate to
-  router.replace(route);
+const handlePress = (route, params) => {
+    // Create a query string from the params object
+    const queryString = new URLSearchParams(params).toString();
+    // Append the query string to the route
+    const urlWithParams = `${route}?${queryString}`;
+    router.replace(urlWithParams);
 };
 
 
 
   return (
-    <View style={{ flex: 1,justifyContent:'center',   paddingTop:getStatusBarHeight(),}}>
+    <View style={{ flex: 1,justifyContent:'center',paddingTop:getStatusBarHeight(),}}>
   
   <StatusBar
     translucent
@@ -233,7 +236,7 @@ const handlePress = (route) => {
 </View>
 </TouchableOpacity>
 
-<TouchableOpacity onPress={() => handlePress('/../ActiveProject')} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
+<TouchableOpacity onPress={() => handlePress('/../ActiveProject', { status: 'Active'})} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
   <View style={{marginTop:20}}>
       <Text style={{marginLeft:15}}>Active Cases</Text>
       <Text style={{fontWeight:'bold',fontSize:20,fontSize:30,alignSelf:'center',marginTop:10}}>{postCounts.Active}</Text>
@@ -250,7 +253,7 @@ const handlePress = (route) => {
 
 <View style={{flexDirection:'row',marginTop:10}}>
 
-<TouchableOpacity onPress={() => handlePress('/../PendingProjects')} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
+<TouchableOpacity onPress={() => handlePress('/../PendingProjects', { status: 'pending'})} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
   <View style={{marginTop:20}}>
       <Text style={{marginLeft:15}}>Pending Cases</Text>
       <Text style={{fontWeight:'bold',fontSize:20,fontSize:30,alignSelf:'center',marginTop:10}}>{postCounts.pending}</Text>
@@ -261,7 +264,7 @@ const handlePress = (route) => {
 </View>
 </TouchableOpacity>
 
-<TouchableOpacity onPress={() => handlePress('/../CompletedProjects')} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
+<TouchableOpacity onPress={() => handlePress('/../CompletedProjects', { status: 'Completed'})} style={{width:'45%',height:100,backgroundColor:'#fff',borderRadius:10,marginLeft:8,flexDirection:'row',justifyContent:'space-between'}}>
   <View style={{marginTop:20}}>
       <Text style={{marginLeft:15}}>Completed Cases</Text>
       <Text style={{fontWeight:'bold',fontSize:20,fontSize:30,alignSelf:'center',marginTop:10}}>{postCounts.Completed}</Text>

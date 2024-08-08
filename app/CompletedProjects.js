@@ -7,7 +7,7 @@ import ComplainBox from '../components/ComplainBox';
 import Entypo from '@expo/vector-icons/Entypo';
 import { getStatusBarHeight } from "react-native-status-bar-height";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 const CompletedProject = () => {
 
@@ -108,13 +108,30 @@ const CompletedProject = () => {
            break;
        }
 
+       const { status} = useLocalSearchParams(); // Get query parameters
+
+       const handlePress = () => {
+
+        if(status){
+    
+          router.replace('/(tabs)/profile')
+   
+        }else{
+          router.back()
+        }
+        
+    }
 
   return (
     <View style={{paddingTop:getStatusBarHeight(),backgroundColor:"#fff",}}>
-
-        <View style={{flexDirection:'row'}}>
+     <StatusBar
+        translucent
+        barStyle="dark-content"
+        backgroundColor="rgba(255, 255, 255, 0)"
+      />
+        <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
         <TouchableOpacity style={{backgroundColor:'#f0f0f0',borderRadius:5,width:30,
-    marginTop:40,height:28,alignItems:'center',justifyContent:'center'}} onPress={router.back}>
+    marginTop:12,height:28,alignItems:'center',justifyContent:'center',marginLeft:30}} onPress={handlePress}>
     <Ionicons name="chevron-back" size={18} color="black" />
   </TouchableOpacity>
 
@@ -124,7 +141,7 @@ const CompletedProject = () => {
 
   {userData ? (
     userData.role === 'citizen' ? 'My Completed Complains' :
-    userData.role === 'ministry' ? 'Completed Ministry`s Complains' :
+    userData.role === 'ministry' ? 'Completed Complains' :
     'Completed Complains'
   ) : 'Loading...'}
    </Text> 
@@ -157,6 +174,7 @@ const CompletedProject = () => {
      <FlatList
   data={post.length ? post : [{ placeholder: true }]}
   keyExtractor={(item) => item.id || 'placeholder'}
+  contentContainerStyle={{ backgroundColor: '#fff'}}
   renderItem={({ item }) => {
     if (item.placeholder) {
       return (
@@ -165,11 +183,11 @@ const CompletedProject = () => {
           <Text style={{ marginVertical: 5 }}>No Complaints</Text>
           {userData ? (
             userData.role === 'citizen' ? (
-              <Text style={{ alignSelf: 'center' }}>You Currently did not Submit any Complaints</Text>
+              <Text style={{ alignSelf: 'center' }}>You Currently have no completed complains</Text>
             ) : userData.role === 'ministry' ? (
-              <Text style={{ alignSelf: 'center' }}>There are Currently no Complaints Submitted</Text>
+              <Text style={{ alignSelf: 'center' }}>There are Currently no Completed Complaints </Text>
             ) : (
-              <Text style={{ alignSelf: 'center' }}>There are Currently no Complaints Submitted</Text>
+              <Text style={{ alignSelf: 'center' }}>There are Currently no Completed Complaints </Text>
             )
           ) : (
             <Text>Loading...</Text>

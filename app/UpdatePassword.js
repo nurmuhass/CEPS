@@ -47,7 +47,7 @@ const ChangePassword = () => {
   
     return (
  <View style={styles.container}>
-               <StatusBar
+ <StatusBar
     translucent
     barStyle="dark-content"
     backgroundColor="rgba(255, 255, 255, 0)" // Transparent white color
