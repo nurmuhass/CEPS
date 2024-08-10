@@ -13,7 +13,7 @@ import Loading from "../../../components/Loading";
 import Entypo from '@expo/vector-icons/Entypo';
 import {Picker} from '@react-native-picker/picker';
 import {datas} from "../feed/"
-
+import NetInfo from '@react-native-community/netinfo';
 
 export const data = [
 
@@ -100,7 +100,7 @@ const Tab1Index = () => {
   const [loading, setLoading] = useState(true);
   const [post, setPosts] = useState([]);
   const [selectedMinistry, setSelectedMinistry] = useState(null);
-
+  const [isConnected, setIsConnected] = useState(true);
   const user= AuthStore.getRawState().user;
   const role =AuthStore.getRawState().role
 
@@ -111,6 +111,15 @@ const Tab1Index = () => {
   }, []); // Empty dependency array means this runs once when the component mounts
   
 
+  useEffect(() => {
+    // Check network connectivity
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    });
+
+    // Cleanup listener on component unmount
+    return () => unsubscribe();
+  }, []);
   useEffect(() => {
     if (userData) {
       fetchMyPosts();
@@ -197,6 +206,27 @@ const router = useRouter();
  const columnData = [data.slice(0, 3), data.slice(3, 6),
    data.slice(6, 9),data.slice(9, 12)];
 
+   if (!isConnected) {
+    return (
+      <View style={{ flex: 1,paddingTop:getStatusBarHeight(),backgroundColor:'#fff'}}>
+         <View style={{ justifyContent:'space-between',flexDirection:'row',marginBottom:30}}>
+      
+      <View style={{flexDirection:'row',justifyContent:'center'}}>
+       <Image source={require("../../../images/logo.jpeg")} style={{width:50,height:50,marginTop:13,marginLeft:5}}/>
+       <Text style={{fontSize:28,fontWeight:'bold',marginTop:17,}}>CEPS</Text>
+    </View>
+    <Image source={require("../../../images/map.jpeg")} resizeMethod="contain" style={{width:40,height:40,marginTop:15,marginRight:20,}}/>
+  
+  </View>  
+      <View style={styles.noConnectionContainer}>
+        <Entypo name="network" size={72} color="black" />
+        <Text style={styles.noConnectionText}>Please check your internet connection.</Text>
+      </View>
+
+      </View>
+
+    );
+  }
 
 
    if (loading) {
@@ -396,5 +426,16 @@ forthColumn: {
   },
   text: {
     marginLeft: 5,
+  },
+  noConnectionContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  noConnectionText: {
+    fontSize: 18,
+    marginTop: 20,
+    textAlign: 'center',
   },
 });

@@ -26,6 +26,7 @@ import { doc, onSnapshot, query, where } from "firebase/firestore";
 import { AuthStore } from '../store';
 import { KeyboardAvoidingView } from 'react-native';
 import { Platform } from 'react-native';
+import { datas } from './(tabs)/feed';
 
 const CHARACTER_LIMIT = 300;
 
@@ -297,7 +298,7 @@ const PostComplain = () => {
             style={{ borderWidth: 2, borderColor: "white", color: 'white', width: "95%", margin: 10, borderRadius: 8, backgroundColor: '#F93C65', marginTop: 0 }}
           >
             <Picker.Item label="Choose Ministry" value="Choose Ministry" disabled />
-            {data.map((item, index) => (
+            {datas.map((item, index) => (
               <Picker.Item label={item.title} value={item.title} key={item.id} />
             ))}
           </Picker>

@@ -9,6 +9,8 @@ import { AuthStore } from "../../../store";
 import RenderHTML from 'react-native-render-html';
 import Loading from "../../../components/Loading";
 import { getDoc} from "firebase/firestore";
+import NetInfo from '@react-native-community/netinfo';
+import Entypo from '@expo/vector-icons/Entypo';
 const posts = [
   {
     id: '1',
@@ -101,9 +103,17 @@ const [timeline,setTimeline]=useState(null)
 const [loading, setLoading] = useState(true);
 const [userData, setUserData] = useState(null);
 const { width } = Dimensions.get('window');
+const [isConnected, setIsConnected] = useState(true);
 
+useEffect(() => {
+  // Check network connectivity
+  const unsubscribe = NetInfo.addEventListener(state => {
+    setIsConnected(state.isConnected);
+  });
 
-
+  // Cleanup listener on component unmount
+  return () => unsubscribe();
+}, []);
 
 // Inside your component or function
 const getTimeline = async () => {
@@ -190,6 +200,27 @@ const renderItem = ({ item }) => (
 );
 
 
+if (!isConnected) {
+  return (
+    <View style={{ flex: 1,paddingTop:getStatusBarHeight(),backgroundColor:'#fff'}}>
+    <View style={{ justifyContent:'space-between',flexDirection:'row',marginBottom:30}}>
+ 
+ <View style={{flexDirection:'row',justifyContent:'center'}}>
+  <Image source={require("../../../images/logo.jpeg")} style={{width:50,height:50,marginTop:13,marginLeft:5}}/>
+  <Text style={{fontSize:28,fontWeight:'bold',marginTop:17,}}>CEPS</Text>
+</View>
+<Image source={require("../../../images/map.jpeg")} resizeMethod="contain" style={{width:40,height:40,marginTop:15,marginRight:20,}}/>
+
+</View>  
+ <View style={styles.noConnectionContainer}>
+   <Entypo name="network" size={72} color="black" />
+   <Text style={styles.noConnectionText}>Please check your internet connection.</Text>
+ </View>
+
+ </View>
+  );
+}
+
     if (loading) {
       // Render a loading indicator or any other UI
       return (
@@ -272,5 +303,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 13,
+  },
+  noConnectionContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  noConnectionText: {
+    fontSize: 18,
+    marginTop: 20,
+    textAlign: 'center',
   },
 });

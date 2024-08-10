@@ -24,6 +24,7 @@ import Loading from '../../../components/Loading';
 import Toast from '../../../components/Toast';
 import { data } from '../home';
 import { AuthStore } from '../../../store';
+import { datas } from '../feed';
 const CHARACTER_LIMIT = 300;
 
 const Post = () => {
@@ -197,6 +198,7 @@ const Post = () => {
           postTime: formattedDate + ' ' + formattedTime,
           images: imageUrls.length === 0 ? null : imageUrls,
           hasImage: imageUrls.length === 0 ? false : true,
+          status:'pending',
         });
       } else {
         await addDoc(collection(db, "timeline"), {
@@ -293,7 +295,7 @@ const Post = () => {
             style={{ borderWidth: 2, borderColor: "white", color: 'white', width: "95%", margin: 10, borderRadius: 8, backgroundColor: '#F93C65', marginTop: 0 }}
           >
             <Picker.Item label="Choose Ministry" value="Choose Ministry" disabled />
-            {data.map((item, index) => (
+            {datas.map((item, index) => (
               <Picker.Item label={item.title} value={item.title} key={item.id} />
             ))}
           </Picker>
