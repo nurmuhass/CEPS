@@ -2,7 +2,7 @@ import { View, Text, Image, FlatList, StyleSheet, Dimensions, StatusBar } from "
 import { Stack, useRouter } from "expo-router";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { auth, db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
 import { AuthStore } from "../../../store";
@@ -11,6 +11,7 @@ import Loading from "../../../components/Loading";
 import { getDoc} from "firebase/firestore";
 import NetInfo from '@react-native-community/netinfo';
 import Entypo from '@expo/vector-icons/Entypo';
+import { TouchableOpacity } from "react-native";
 const posts = [
   {
     id: '1',
@@ -104,6 +105,53 @@ const [loading, setLoading] = useState(true);
 const [userData, setUserData] = useState(null);
 const { width } = Dimensions.get('window');
 const [isConnected, setIsConnected] = useState(true);
+const user= AuthStore.getRawState().user;
+const [likedPosts, setLikedPosts] = useState({});
+
+
+
+useEffect(() => {
+  const initializeLikedPosts = () => {
+    const initialLikedPosts = {};
+    timeline.forEach(post => {
+      // Check if likedByUser is defined and default to an empty array if not
+      const likedByUser = post.likedByUser || [];
+      initialLikedPosts[post.id] = likedByUser.includes(user.uid);
+    });
+    setLikedPosts(initialLikedPosts);
+  };
+
+  if (timeline) {
+    initializeLikedPosts();
+  }
+}, [timeline, user.uid]);
+
+
+const toggleLike = async (postId) => {
+  try {
+    const isLiked = likedPosts[postId];
+    setLikedPosts(prev => ({ ...prev, [postId]: !isLiked }));
+
+    const postRef = doc(db, 'timeline', postId);
+
+    // Fetch current post data
+    const postSnap = await getDoc(postRef);
+    const postData = postSnap.data();
+
+    // Ensure likedByUser is initialized
+    const likedByUser = postData.likedByUser || [];
+
+    await updateDoc(postRef, {
+      likedByUser: isLiked
+        ? likedByUser.filter(id => id !== user.uid) // Remove user ID if already liked
+        : [...likedByUser, user.uid] // Add user ID if not liked
+    });
+  } catch (error) {
+    console.error('Error updating like status:', error);
+  }
+};
+
+
 
 useEffect(() => {
   // Check network connectivity
@@ -192,7 +240,13 @@ const renderItem = ({ item }) => (
       <Image source={{ uri: item.images[0] }} style={styles.postImage} />
     )}
     <View style={styles.actionsContainer}>
-      <AntDesign name="hearto" size={20} color="black" />
+    <TouchableOpacity onPress={() => toggleLike(item.id)}>
+        <AntDesign
+          name={likedPosts[item.id] ? 'heart' : 'hearto'}
+          size={20}
+          color={likedPosts[item.id] ? 'red' : 'black'}
+        />
+      </TouchableOpacity>
       <AntDesign name="sharealt" size={20} color="black" />
       <Ionicons name="stats-chart-outline" size={20} color="black" />
     </View>

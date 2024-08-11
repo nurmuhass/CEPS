@@ -208,6 +208,7 @@ const Post = () => {
           postTime: formattedDate + ' ' + formattedTime,
           images: imageUrls.length === 0 ? null : imageUrls,
           hasImage: imageUrls.length === 0 ? false : true,
+          likesCount:0,
         });
       }
 
