@@ -230,7 +230,7 @@ const Ministries = () => {
 //    datas.slice(8, 12),datas.slice(12, 16),datas.slice(16, 20),datas.slice(20, 24)];
 
   return (
-    <View style={{ flex: 1,paddingTop:getStatusBarHeight(),}}>
+    <View style={{ flex: 1,paddingTop:getStatusBarHeight(),backgroundColor:'#fff'}}>
       {/* <Stack.Screen options={{ headerShown: true, title: "Home" }} /> */}
       {/* <Link href="/home/details">Go to Details</Link>
       <Link href="/home/new-entry-modal">Present modal</Link> */}
@@ -240,6 +240,19 @@ const Ministries = () => {
     backgroundColor="rgba(255, 255, 255, 0)" // Transparent white color
 />
 
+<View style={{ justifyContent:'space-between',flexDirection:'row',marginBottom:30}}>
+      
+      <View style={{flexDirection:'row',justifyContent:'center'}}>
+       <Image source={require("../../../images/logo.jpeg")} style={{width:50,height:50,marginTop:13,marginLeft:5}}/>
+       <Text style={{fontSize:28,fontWeight:'bold',marginTop:17,}}>CEPS</Text>
+    </View>
+   
+  
+    <Image source={require("../../../images/map.jpeg")} resizeMethod="contain" style={{width:40,height:40,marginTop:15,marginRight:20,}}/>
+  
+  
+   
+      </View>
 
 <FlatList
 	data={[{}]}

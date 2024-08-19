@@ -31,9 +31,9 @@ const TabsLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="post"
+        name="ministries"
         options={{
-          title: "Post",
+          title: "ministries",
           tabBarIcon: () => <MaterialIcons name="add-box" size={24} color="black" />,
         }}
       />

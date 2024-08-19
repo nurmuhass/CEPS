@@ -102,13 +102,7 @@ const Tab1Index = () => {
   const [selectedMinistry, setSelectedMinistry] = useState(null);
   const [isConnected, setIsConnected] = useState(true);
   const user= AuthStore.getRawState().user;
-  const role =AuthStore.getRawState().role
 
-
-  useEffect(() => {
-    // Fetch the user data first
-    getUser();
-  }, []); // Empty dependency array means this runs once when the component mounts
   
 
   useEffect(() => {
@@ -125,6 +119,12 @@ const Tab1Index = () => {
       fetchMyPosts();
     }
   }, [userData, selectedMinistry]);
+
+
+  useEffect(() => {
+    // Fetch the user data first
+    getUser();
+  }, []); // Empty dependency array means this runs once when the component mounts
 
   
   const getUser = async () => {
@@ -289,7 +289,7 @@ const router = useRouter();
           numberOfLines={1}
           style={{padding: 10,borderRadius:20}}
           
-          placeholder= {userData.role ? (userData.role === 'citizen' ? 'Post a Complain' : 'Make a post') : 'Loading...' }
+          placeholder= {userData ? (userData.role === 'citizen' ? 'Post a Complain' : 'Make a post') : 'Loading...' }
           onFocus={handlePress}
         />
   </TouchableOpacity>
@@ -326,7 +326,7 @@ const router = useRouter();
     'Complains'
   ) : 'Loading...'}
    </Text>  
-   {userData.role === 'Governor' && (
+   {userData ?  ( userData.role === 'Governor' && (
   <View style={{ padding: 10 }}>
    <Picker
   selectedValue={selectedMinistry}
@@ -341,7 +341,9 @@ const router = useRouter();
 
     
   </View>
-)}
+) ) :''
+
+}
 <FlatList
   data={post.length ? post : [{ placeholder: true }]}
   keyExtractor={(item) => item.id || 'placeholder'}
@@ -352,13 +354,22 @@ const router = useRouter();
       
     
       <Entypo name="emoji-happy" size={72} color="black" />
-        <Text style={{marginVertical:5}}>No Complains</Text>
+      
         
   {userData ? (
     userData.role === 'citizen' ?      <Text style={{alignSelf:'center'}}>You Currently did not Submit any Complains</Text> :
     userData.role === 'ministry' ?      <Text style={{alignSelf:'center'}}>There are Currently no Complains Submitted</Text> :
-    <Text style={{alignSelf:'center'}}>There are Currently no Complains Submitted</Text>
-  ) : 'Loading...'}
+   
+   <>
+     <Text style={{marginVertical:5}}>No Complains</Text>
+   <Text style={{alignSelf:'center'}}>
+      There are Currently no Complains Submitted</Text>
+   </>
+  
+  ) :  <Text style={{alignSelf:'center'}}>
+  Bad Internet connection
+  
+  </Text>}
    
         
         </View>

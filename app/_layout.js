@@ -13,7 +13,7 @@ import {
   EncodeSansSemiCondensed_800ExtraBold,
   EncodeSansSemiCondensed_900Black,
 } from '@expo-google-fonts/encode-sans-semi-condensed';
-import { Text } from "react-native";
+import { Image, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function Layout() {
@@ -29,7 +29,12 @@ export default function Layout() {
     // The native splash screen will stay visible for as long as there
     // are `<SplashScreen />` components mounted. This component can be nested.
 
-    return <Text> Loading</Text>;
+    return (
+<View style={{flex:1,backgroundColor:'#fff'}}> 
+    <Image source={require("../assets/images/splash.png")} 
+    style={{height:'100%',width:'100%'}}/>
+</View>
+    ) 
   }
 
   return (

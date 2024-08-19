@@ -33,6 +33,8 @@ const Index = () => {
     }
   }, [segments, navigationState?.key, initialized]);
 
-  return <View>{!navigationState?.key ? <Image source={require("../assets/images/splash.png")} style={{height:'100%',width:'100%'}}/> : <></>}</View>;
+  return <View style={{flex:1,backgroundColor:'#fff'}}>
+    {!navigationState?.key ? <Image source={require("../assets/images/splash.png")}
+     style={{height:'100%',width:'100%'}}/> : <></>}</View>;
 };
 export default Index;

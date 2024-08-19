@@ -26,7 +26,8 @@ import { doc, onSnapshot, query, where } from "firebase/firestore";
 import { AuthStore } from '../store';
 import { KeyboardAvoidingView } from 'react-native';
 import { Platform } from 'react-native';
-import { datas } from './(tabs)/feed';
+import { datas } from './(tabs)/ministries';
+
 
 const CHARACTER_LIMIT = 300;
 

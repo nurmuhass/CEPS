@@ -1,323 +1,382 @@
-import { Link, Redirect, Stack, useRouter } from "expo-router";
-import { FlatList, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { getStatusBarHeight } from "react-native-status-bar-height";
-import ComplainBox from "../../../components/ComplainBox";
-import { TextInput } from "react-native";
-import { ScrollView } from "react-native";
-import { db } from "../../../firebase-config";
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import { View, Text, Image, FlatList, StyleSheet, Dimensions, StatusBar } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { collection, doc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { auth, db } from "../../../firebase-config";
+import { useEffect, useState } from "react";
 import { AuthStore } from "../../../store";
-import { useState } from "react";
-import { useEffect } from "react";
-
-
-
-
-export const datas = [
+import RenderHTML from 'react-native-render-html';
+import Loading from "../../../components/Loading";
+import { getDoc} from "firebase/firestore";
+import NetInfo from '@react-native-community/netinfo';
+import Entypo from '@expo/vector-icons/Entypo';
+import { TouchableOpacity } from "react-native";
+import { getStatusBarHeight } from "react-native-status-bar-height";
+const posts = [
   {
     id: '1',
-    title: 'Ministry Higher Education',
-    image: require('../../../images/ministries/higherEducation.jpeg'),
+    ministry: 'Ministry of Health',
+    time: '2 min',
+    content: 'Vaccination campaign has started in the city.',
+    hasImage: false,
+    imageUrl: null,
   },
   {
     id: '2',
-    title: 'Ministry of Health',
-    image: require('../../../images/ministries/health.jpeg'),
+    ministry: 'Ministry of Education',
+    time: '10 min',
+    content: 'New curriculum guidelines are released.New curriculum guidelines are released',
+    hasImage: true,
+    imageUrl: require("../../../images/download.jpeg"),
   },
   {
     id: '3',
-    title: 'Ministry of Education',
-    image: require('../../../images/ministries/education.jpeg'),
+    ministry: 'Ministry of Infrastructure',
+    time: '30 min',
+    content: 'Road maintenance works in progress on Main Street.',
+    hasImage: false,
+    imageUrl: null,
   },
   {
     id: '4',
-    title: 'Ministry of Finance',
-    image: require('../../../images/ministries/Finance.jpeg'),
+    ministry: 'Ministry of Environment',
+    time: '45 min',
+    content: 'Tree planting event scheduled for next week.',
+    hasImage: true,
+    imageUrl: require("../../../images/download.jpeg"),
   },
   {
     id: '5',
-    title: 'Ministry of Agriculture',
-    image: require('../../../images/ministries/Agriculture.jpeg'),
+    ministry: 'Ministry of Transport',
+    time: '1 hour',
+    content: 'New public transport routes have been announced.',
+    hasImage: false,
+    imageUrl: null,
   },
   {
     id: '6',
-    title: 'Ministry of Transport',
-    image: require('../../../images/ministries/Transport.jpeg'),
+    ministry: 'Ministry of Finance',
+    time: '1 hour',
+    content: 'New tax regulations are now in effect.',
+    hasImage: true,
+    imageUrl: require("../../../images/download.jpeg"),
   },
   {
     id: '7',
-    title: 'Ministry Local government and community affairs',
-    image: require('../../../images/ministries/Local government.jpeg'),
+    ministry: 'Ministry of Culture',
+    time: '1 hour 30 min',
+    content: 'Cultural festival preparations are underway.',
+    hasImage: false,
+    imageUrl: null,
   },
   {
     id: '8',
-    title: 'Ministry of Humanitarian',
-    image: require('../../../images/ministries/Humanitarian.jpeg'),
+    ministry: 'Ministry of Agriculture',
+    time: '2 hours',
+    content: 'New agricultural subsidies are available for farmers.',
+    hasImage: true,
+    imageUrl: require("../../../images/download.jpeg"),
   },
   {
     id: '9',
-    title: 'Ministry of Environment',
-    image: require('../../../images/ministries/Environment.jpeg'),
+    ministry: 'Ministry of Tourism',
+    time: '2 hours 15 min',
+    content: 'Tourism promotion campaign launched.',
+    hasImage: false,
+    imageUrl: null,
   },
   {
     id: '10',
-    title: ' Ministry of Women affairs',
-    image: require('../../../images/ministries/Women affairs.jpg'),
-  },
-  {
-    id: '11',
-    title: 'Ministry of Agriculture & natural resources',
-    image: require('../../../images/ministries/Agriculture & natural resources.jpeg'),
-  },
-  {
-    id: '12',
-    title: 'Ministry of Commerce and industry ',
-    image: require('../../../images/ministries/Commerce and industry.jpeg'),
-  },
-  {
-    id: '13',
-    title: 'Ministry of Information',
-    image: require('../../../images/ministries/Information.jpeg'),
-  },
-  {
-    id: '14',
-    title: 'Ministry Land and physical planning',
-    image: require('../../../images/ministries/Land and physical planning.jpeg'),
-  },
-  {
-    id: '15',
-    title: 'Ministry of Planning and budget',
-    image: require('../../../images/ministries/Planning and budget.jpg'),
-  },
-  {
-    id: '16',
-    title: 'Ministry of Rural and community development',
-    image: require('../../../images/ministries/Rural and community development.jpeg'),
-  },
-  {
-    id: '17',
-    title: 'Ministry of Science and technology',
-    image: require('../../../images/ministries/Science and technology.jpeg'),
-  },
-  {
-    id: '18',
-    title: 'Ministry of Water resources',
-    image: require('../../../images/ministries/Water resources.jpeg'),
-  },
-  {
-    id: '19',
-    title: 'Ministry of Solid Minerals Resources',
-    image: require('../../../images/ministries/Solid Minerals Resources.jpeg'),
-  },
-  {
-    id: '20',
-    title: 'Ministry of Power and Renewable energy',
-    image: require('../../../images/ministries/Power and Renewable energy.jpeg'),
-  },
-  {
-    id: '21',
-    title: 'Ministry of Internal Security and Special Service',
-    image: require('../../../images/ministries/Internal Security and Special Service.jpeg'),
-  },
-  {
-    id: '22',
-    title: 'Ministry of Youth and sport',
-    image: require('../../../images/ministries/Youth and sport.jpeg'),
-  },
-  {
-    id: '23',
-    title: 'Ministry of Special duties',
-    image: require('../../../images/ministries/special duties.jpeg'),
-  },
-  {
-    id: '24',
-    title: 'Ministry of Works & housing',
-    image: require('../../../images/ministries/Works & housing.jpeg'),
+    ministry: 'Ministry of Information',
+    time: '2 hours 30 min',
+    content: 'Public announcement on recent policy changes.',
+    hasImage: true,
+    imageUrl: require("../../../images/download.jpeg"),
   },
 ];
 
 
 
-const Tab1Index = () => {
 
+export default function TimeLine() {
+  const router = useRouter();
+const [timeline,setTimeline]=useState(null)
+const [loading, setLoading] = useState(false);
+const [userData, setUserData] = useState(null);
+const { width } = Dimensions.get('window');
+const [isConnected, setIsConnected] = useState(true);
+const user= AuthStore.getRawState().user;
+const [likedPosts, setLikedPosts] = useState({});
 
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [post, setPosts] = useState([]);
-
-  const user= AuthStore.getRawState().user;
-
-
-
-  useEffect(() => {
-    getUser();
-    fetchMyPosts();
-  }, []);
-  
-  
-  const getUser = async () => {
-  
-  const docRef = doc(db, 'users', user.uid)
-  
-  const unsubscribe = onSnapshot(docRef, (docSnap) => {
-  
-   if (docSnap.exists()) {
-  
-     setUserData(docSnap.data());
-   } else {
-     console.log('No User Data');
-   }
-  
-   setLoading(false);
+useEffect(() => {
+  // Check network connectivity
+  const unsubscribe = NetInfo.addEventListener(state => {
+    setIsConnected(state.isConnected);
   });
-  
-  // This will detach the listener when the component is unmounted
-  return () => {
-   
-   unsubscribe();
-  };
+
+  // Cleanup listener on component unmount
+  return () => unsubscribe();
+}, []);
+
+useEffect(() => {
+  const initializeLikedPosts = () => {
+    const initialLikedPosts = {};
+    timeline.forEach(post => {
+      // Check if likedByUser is defined and default to an empty array if not
+      const likedByUser = post.likedByUser || [];
+      initialLikedPosts[post.id] = likedByUser.includes(user.uid);
+    });
+    setLikedPosts(initialLikedPosts);
   };
 
-  const fetchMyPosts = async () => {
-    try {
-      const querySnapshot = onSnapshot(
-        query(collection(db, "posts"), where("userId", "==", user.uid)), 
-        async (snapShot) => { // Make the callback function async
-          const list = [];
-          for (const doc of snapShot.docs) {
-            let postData = { id: doc.id, ...doc.data() }; // Declare postData using let
-        
-            list.push(postData);
-          
-          }
-  
-          setPosts(list);
-  
-          if (loading) {
-            setLoading(false);
-          }
-        },
-        (error) => {
-          // handle the error
+  if (timeline) {
+    initializeLikedPosts();
+  }
+}, [timeline, user.uid]);
+
+
+const toggleLike = async (postId) => {
+  try {
+    const isLiked = likedPosts[postId];
+    setLikedPosts(prev => ({ ...prev, [postId]: !isLiked }));
+
+    const postRef = doc(db, 'timeline', postId);
+
+    // Fetch current post data
+    const postSnap = await getDoc(postRef);
+    const postData = postSnap.data();
+
+    // Ensure likedByUser is initialized
+    const likedByUser = postData.likedByUser || [];
+
+    await updateDoc(postRef, {
+      likedByUser: isLiked
+        ? likedByUser.filter(id => id !== user.uid) // Remove user ID if already liked
+        : [...likedByUser, user.uid] // Add user ID if not liked
+    });
+  } catch (error) {
+    console.error('Error updating like status:', error);
+  }
+};
+
+
+// Inside your component or function
+const getTimeline = async () => {
+  try {
+    setLoading(true); // Start loading
+
+    const list = [];
+
+    const unsubscribe = onSnapshot(collection(db, "timeline"), async (querySnapshot) => {
+      list.length = 0; // Clear the list to prevent duplicates
+
+      // Create an array of promises to fetch user data for each post
+      const userDataPromises = querySnapshot.docs.map(async (docSnapshot) => {
+        const postData = { id: docSnapshot.id, ...docSnapshot.data() };
+
+        // Fetch user data using the userId from the postData
+        const userRef = doc(db, 'users', postData.userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          // Attach user data to the postData object
+          return { ...postData, userData };
+        } else {
+          console.log('No User Data');
+          return { ...postData, userData: null };
         }
-      );
-  
-      return () => {
-        querySnapshot();
-      };
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    }
-  };
-  
+      });
+
+      // Resolve all promises and set the timeline state
+      const resolvedPosts = await Promise.all(userDataPromises);
+      setTimeline(resolvedPosts);
+      setLoading(false); // Stop loading after setting the timeline
+    });
+
+    // Return the unsubscribe function to stop listening when needed
+    return unsubscribe;
+  } catch (e) {
+    console.error('Error fetching timeline:', e);
+    setLoading(false); // Stop loading in case of error
+  }
+};
 
 
-  const renderColumn = (columnData) => (
-    <View style={styles.columnContainer}>
-      {columnData.map((item) => (
-        <Item key={item.id} title={item.title} image={item.image} />
-      ))}
+useEffect(() => {
+  getTimeline();
+
+}, []);
+
+if (timeline === 0) {
+  return (
+    <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: '#fff', height: 200 }}>
+      <Entypo name="emoji-happy" size={72} color="black" />
+      <Text style={{ marginVertical: 5 }}>No Post</Text>
+      <Text style={{ alignSelf: 'center' }}>There are Currently no Posts</Text>
     </View>
   );
-  const handlePress = () => {
-    router.replace('/../../PostComplain');
-    
-  };
+}
+  
+const renderItem = ({ item }) => (
+  <View style={styles.postContainer}>
+    <View style={styles.headerContainer}>
+      <Image
+        source={item.userData?.image ? { uri: item.userData.image } : require("../../../images/user.jpg")}
+        style={styles.profileImage}
+      />
+      <View style={styles.headerTextContainer}>
+        <View style={styles.headerText}>
+          <Text style={styles.username}>{item.Ministry}</Text>
+          <Text style={styles.timestamp}>{item.time}</Text>
+        </View>
+        <RenderHTML contentWidth={width} source={{ html: item.content }} />
+      </View>
+    </View>
+    {item.hasImage && item.images && item.images[0] && (
+      <Image source={{ uri: item.images[0] }} style={styles.postImage} />
+    )}
+    <View style={styles.actionsContainer}>
+    <TouchableOpacity onPress={() => toggleLike(item.id)}>
+        <AntDesign
+          name={likedPosts[item.id] ? 'heart' : 'hearto'}
+          size={20}
+          color={likedPosts[item.id] ? 'red' : 'black'}
+        />
+      </TouchableOpacity>
+      <AntDesign name="sharealt" size={20} color="black" />
+      <Ionicons name="stats-chart-outline" size={20} color="black" />
+    </View>
+  </View>
+);
 
-const router = useRouter();
- // Split data into two columns
- const columnData = [datas.slice(0, 4), datas.slice(4, 8),
-   datas.slice(8, 12),datas.slice(12, 16),datas.slice(16, 20),datas.slice(20, 24)];
+
+if (!isConnected) {
+  return (
+    <View style={{ flex: 1,paddingTop:getStatusBarHeight(),backgroundColor:'#fff'}}>
+    <View style={{ justifyContent:'space-between',flexDirection:'row',marginBottom:30}}>
+ 
+ <View style={{flexDirection:'row',justifyContent:'center'}}>
+  <Image source={require("../../../images/logo.jpeg")} style={{width:50,height:50,marginTop:13,marginLeft:5}}/>
+  <Text style={{fontSize:28,fontWeight:'bold',marginTop:17,}}>CEPS</Text>
+</View>
+<Image source={require("../../../images/map.jpeg")} resizeMethod="contain" style={{width:40,height:40,marginTop:15,marginRight:20,}}/>
+
+</View>  
+ <View style={styles.noConnectionContainer}>
+   <Entypo name="network" size={72} color="black" />
+   <Text style={styles.noConnectionText}>Please check your internet connection.</Text>
+ </View>
+
+ </View>
+  );
+}
+
+    if (loading) {
+      // Render a loading indicator or any other UI
+      return (
+        <View style={{ height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', zIndex: 99 }}>
+          <Loading size={100} />
+        </View>
+      );
+    }
+
 
   return (
-    <View style={{ flex: 1,paddingTop:getStatusBarHeight(),}}>
-      {/* <Stack.Screen options={{ headerShown: true, title: "Home" }} /> */}
-      {/* <Link href="/home/details">Go to Details</Link>
-      <Link href="/home/new-entry-modal">Present modal</Link> */}
-  <StatusBar
-    translucent
-    barStyle="dark-content"
-    backgroundColor="rgba(255, 255, 255, 0)" // Transparent white color
-/>
-
-
-<FlatList
-	data={[{}]}
-	renderItem={() =><>
-
-
-
-
-<View style={{marginHorizontal:"6%"}}>
-<FlatList
-              data={datas}
-              numColumns={2}
-              keyExtractor={(item) => item.id}
-              renderItem={({item, index}) => {
-                return (
-<View style={{width:'48%',marginLeft:5,marginBottom:8}}>
-<Image source={item.image} style={{width:'98%',
-  height:150,borderRadius:15}}/>
-<Text numberOfLines={3} style={{justifyContent:'center',fontSize:12,marginLeft:4}}>{item.title}</Text>
-
-</View>
-                );
-              }}
-            />
-
-</View>
-
-
-
-</>}
+    <View style={{ flex: 1,paddingTop:getStatusBarHeight(),backgroundColor:'#fff'}}>
+     <StatusBar
+        translucent
+        barStyle="dark-content"
+        backgroundColor="rgba(255, 255, 255, 0)"
+      />
+    <View style={{ justifyContent:'space-between',flexDirection:'row',marginBottom:30}}>
+      
+      <View style={{flexDirection:'row',justifyContent:'center'}}>
+       <Image source={require("../../../images/logo.jpeg")} style={{width:50,height:50,marginTop:13,marginLeft:5}}/>
+       <Text style={{fontSize:28,fontWeight:'bold',marginTop:17,}}>CEPS</Text>
+    </View>
+   
+  
+    <Image source={require("../../../images/map.jpeg")} resizeMethod="contain" style={{width:40,height:40,marginTop:15,marginRight:20,}}/>
+  
+  
+   
+      </View>
+ <FlatList
+      data={timeline}
+      keyExtractor={(item) => item.id}
+      renderItem={renderItem}
+      contentContainerStyle={{ paddingBottom: 20 }}
     />
+
     </View>
   );
-};
-export default Tab1Index;
+}
+
+//https://fonts.google.com/specimen/Encode+Sans+Semi+Condensed
+
 
 const styles = StyleSheet.create({
-  scrollView: {
-    width: '100%',
+  postContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e1e8ee',
     backgroundColor: '#fff',
-    paddingVertical: 20,
-    paddingLeft:20
   },
-  columnWrapper: {
-    flexDirection: 'column',
-  },
-  firstColumn: {
-    marginRight: 70, 
-  },
-  secondColumn: {
-    marginRight: 70, 
-  },
-  thirdColumn: {
-    marginRight: 70, 
-  },
-forthColumn: {
-  marginRight: 70, 
-  },
-  fifthColumn: {
-    marginRight: 70, 
-  },
-  sixedColumn: {
-    marginLeft: 25, 
-    marginRight: 90,
-  },
-  itemContainer: {
+  headerContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    width: 100,
-    marginBottom: 10,
-  },
-  image: {
-    width: 70,
-    height: 80,
-    borderRadius: 8,
     marginBottom: 5,
   },
-  text: {
-    marginLeft: 5,
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  headerText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    flexShrink: 1,
+  },
+  username: {
+    fontWeight: 'bold',
+    marginRight: 5,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: 'grey',
+  },
+  content: {
+    fontSize: 13,
+    color: 'grey',
+    marginTop: 5,
+    flexShrink: 1,
+  },
+  postImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 13,
+  },
+  noConnectionContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  noConnectionText: {
+    fontSize: 18,
+    marginTop: 20,
+    textAlign: 'center',
   },
 });
